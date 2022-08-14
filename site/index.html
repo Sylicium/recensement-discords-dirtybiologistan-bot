@@ -1,0 +1,242 @@
+<html>
+
+<head>
+	<title>
+		DirtyBiologistan | Tous les Discords
+	</title>
+	<meta charset="utf-8">
+	<meta property="og:title" content="DirtyBiologistan | Tous les Discords">
+	<meta property="og:description" content="Liste de tous les Discords de la micronation">
+    <meta property="og:image" content="https://referencementdbg.gouv.repl.co/files/discord_default_avatar_0.png">
+    <link rel="stylesheet" href="./style.css">
+
+</head>
+
+<body>
+
+    <div id="toasts"></div>
+
+    <div class="loading_body" hidden>
+        <h1 class="title">Chargement...</h1>
+    </div>
+
+
+    <h1>
+        <a href="https://discord.com/api/oauth2/authorize?client_id=968799075686289409&permissions=294205643841&scope=bot%20applications.commands" target="_BLANK">Ajouter le bot pour référencer mon serveur</a>
+    </h1>
+
+
+
+
+
+    <div class="whole_body">
+
+        <div class="main">
+
+            <div id="all_discords" class="selectPage">
+                <div>
+                    <h2>Rechercher: </h2>
+                    <select id="all_discords_sort_selector" class="input_select" onchange='searchDiscord("all_discords")'>
+                        <option value="allDiscords">Tous les Discords</option>
+                        <option value="certifiedDiscords">Discords certifié de la micronation</option>
+                        <option value="min100members">Discords de +100 membres</option>
+                        <option value="min1000members">Discords de +1000 membres</option>
+                    </select>
+                    <input id="all_discords_query" class="input_query" placeholder="Rechercher un Discord" onchange='searchDiscord("all_discords")'> <button class="all_discords_query_confirmButton" onchange='searchDiscord("all_discords_query")'>Ok</button>
+                    <div id="displayedDiscordsCount_all_discords">0 serveurs sur 0 affichés</div>
+                </div>
+
+
+
+
+                <div id="all_discords_list" class="discords_list">
+                    <br> <h1 id="all_discords_loadingComponent">Récupération des Discords en cours...</h1>
+                    <!--
+                    <div class="guild guild_2098572395 noselect">
+                        <div class="content_left">
+            
+                            <div class="guild_informations">
+                                <div class="info">
+                                    <div class="guild_icon_div not_added">
+                                        <img class="guild_icon_img" src="https://cdn.discordapp.com/icons/959613928961351712/5e4c485559cef7a9d6ec3122900111e8.webp?size=96"/>
+                                    </div>
+                                </div>
+                                <div class="info">
+                                    <div class="name"><h2 class="guild_name">United Factions of r/Place</h2></div>
+                                </div>
+                            </div>
+                            <div class="guild_buttons">
+                                <div class="button button_join_guild" onclick="open('308739085738590735')">Rejoindre</div>
+                            </div>
+                        </div>
+                        <div class="content_right">
+                            <div class="guild_informations">
+                                <div class="members bold big"><span class="total mini_info">2</span> membres</div>
+                                <div class="online_members bold big"><span class="online mini_info">1</span> en ligne</div>
+                                <div class="created_date">Créé il y a <span class="created_since info">266 jours</span></div>
+                                <div class="messages_lastWeek"> <span class="stat_messages_lastWeek info">19</span> msg les 7 derniers jours</div>
+                                <div class="messages_lastMonth"> <span class="stat_messages_lastMonth info">192</span> msg les 31 derniers jours</div>
+                            </div>
+                            <div class="separator"></div>
+                            <div class="developer_mode">
+                                <h3 class="title">Developer section</h3>
+                                <div class="guild_id">Guild ID: 398563985653</div>
+                                <div class="owner_tag">Sylicium#2487</div>
+                            </div>
+                        </div>
+                    </div> -->
+
+                </div>
+
+            </div> <!-- End all_laws -->
+
+            
+            
+        </div>
+
+    </div>
+
+
+</body>
+<style>
+
+	body {
+		background: #113;
+		color: whitesmoke;
+		font-family: calibri;
+        margin: 0px;
+        margin-top: 8px;
+        padding: 0px;
+        padding-top: 70px;
+	}
+
+    #toasts {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+    .toast {
+        background-color: #444444;
+        border-radius: 5px;
+        padding: 1rem 2rem;
+        margin: 0.5rem;
+    }
+    .toast.info {color: #44FFFF;}.toast.success {color: #00FF00;}.toast.warn {color: orange;}.toast.error {color: #FF3333;}
+    .toasts.toast_fadeout {background-color: red;}
+
+
+    div.loading_body {
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin: 0px auto;
+        padding-top: 42vh;
+        width: 400px;
+        background-color: #FFF;
+        width: 100%;
+        height: 100%;
+        color: #000;
+        /*background-color: #222;*/
+        text-align: center;
+    }
+
+    
+
+
+    .noselect {
+        -webkit-touch-callout: none; /* iOS Safari */
+          -webkit-user-select: none; /* Safari */
+           -khtml-user-select: none; /* Konqueror HTML */
+             -moz-user-select: none; /* Old versions of Firefox */
+              -ms-user-select: none; /* Internet Explorer/Edge */
+                  user-select: none; /* Non-prefixed version, currently
+                                        supported by Chrome, Edge, Opera and Firefox */
+    }
+
+	div.main {
+		display: block;
+		/*position: relative;*/
+		/*top: 30vh;*/
+		text-align: center;
+        /*border: 4mm ridge rgba(170, 50, 220, .6);*/
+        margin: 0.5%;
+        padding: 1%;
+        font-family: consolas;
+	}
+
+
+
+</style>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="./basicFunctions.js"></script>
+<script src="./script.js"></script>
+
+<script>
+
+
+    let AllGuilds = [
+    {
+            "guild": {
+                "id": "909168225936363601",
+                "name": "Assistance bot ORU",
+                "iconURL": "https://cdn.discordapp.com/icons/909168225936363601/8085677e4d9c0859fa5cf0bf3b040d7d.webp",
+                "createdAt": 1636832996592
+            },
+            "friendlyName": "Assistance bot ORU",
+            "keywords": [ "assistance", "bot", "oru" ],
+            "owner": {
+                "id": "774003919625519134",
+                "username": "Sylicium",
+                "tag": "Sylicium#2487",
+                "discriminator": "2487"
+            },
+            "statistics": {
+                "messages": {
+                    "lastWeek": [],
+                    "lastMonth": []
+                }
+            },
+            "inviteURL": "https://discord.gg/dxpYfWq33v",
+            "isBotOnGuild": true,
+            "averageMembers": {
+                "total": 94,
+                "online": 23
+            }
+        },{
+            "guild": {
+                "id": "909168225936363601",
+                "name": "Assistance bot ORU",
+                "iconURL": "https://cdn.discordapp.com/icons/909168225936363601/8085677e4d9c0859fa5cf0bf3b040d7d.webp",
+                "createdAt": 1636832996592
+            },
+            "friendlyName": "Assistance bot ORU",
+            "keywords": [ "assistance", "bot", "oru" ],
+            "owner": {
+                "id": "774003919625519134",
+                "username": "Sylicium",
+                "tag": "Sylicium#2487",
+                "discriminator": "2487"
+            },
+            "statistics": {
+                "messages": {
+                    "lastWeek": [],
+                    "lastMonth": []
+                }
+            },
+            "inviteURL": "https://discord.gg/dxpYfWq33v",
+            "isBotOnGuild": true,
+            "averageMembers": {
+                "total": 94,
+                "online": 23
+            }
+        }
+    ]
+
+</script>
+
+</html>
