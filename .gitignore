@@ -13,4 +13,3 @@ node_modules
 node_modules/*
 node_modules/
 /node_modules/*
-node_modules/@sapphire/async-queue/dist/lib/AsyncQueue.d.ts

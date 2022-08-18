@@ -163,7 +163,7 @@ class Logger {
         /*if(!logName) {
             
         }*/
-        console.log("fileInfos:",fileInfos)
+        //console.log("fileInfos:",fileInfos)
         fileInfos.fileName = fileInfos.fileName
         let logFileName = fileInfos.fileName
 
