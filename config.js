@@ -3,6 +3,11 @@ module.exports = {
         prefix: "-",
         id: "",
         token: process.env["TOKEN"],
+        setApplicationCommandsOnStart: true,
+        setApplicationCommandsInLocal: true,
+        setApplicationCommandsInLocal_guilds: [
+            "909168225936363601"
+        ]
     },
     server: {
         port: 80

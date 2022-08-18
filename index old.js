@@ -3,13 +3,8 @@ const discordInv = require('discord-inv');
 
 let inDev = true
 
-try {
-    require("dotenv").config()
-} catch(e) {}
-
 function writeUncaughException(e, title) {
     console.error("[DBG] Uncaught Exception or Rejection", e.stack)
-    console.error(e.stack.split("\n"))
     const fs = require('fs')
 
     let date = (new Date).toLocaleString("fr-FR")
@@ -34,11 +29,10 @@ function writeUncaughException(e, title) {
             bot.channels.cache.get("1008343948093313076").send(`@everyone **${e}** \`\`\`js\n${e.stack}\`\`\` `)
         })
     } catch (err) {
-        //console.log(err)
+        console.log(err)
     }
     
 }
-
 
 process
     .on('unhandledRejection', (reason, p) => {
@@ -53,12 +47,15 @@ process
 let Discord = require("discord.js")
 let _normalize = require('normalize-strings');
 let Intents = Discord.Intents
-let EmbedBuilder = Discord.EmbedBuilder
+let MessageEmbed = Discord.MessageEmbed
 const fs = require("fs");
 //const { SlashCommandBuilder } = require("discordjs/builders")
 let config = require('./config')
 let somef = require('./localModules/someFunctions')
-let botf = require('./bot/botLocalModules/botFunctions')
+
+try {
+    require("dotenv").config()
+} catch(e) {}
 
 let keepAliveDatas = JSON.parse(fs.readFileSync("./datas/keepalive.json", "utf-8"))
 
@@ -74,7 +71,7 @@ https://discord.com/api/oauth2/authorize?client_id=968799075686289409&permission
 */
 
 let Logger = new (require("./localModules/logger"))()
-const Database = require("./localModules/database");
+const Database = require("./localModules/database")
 const MongoClient = require('mongodb').MongoClient;
 
 let url = process.env.MONGODB_URL
@@ -84,46 +81,18 @@ Logger.info("=======================================")
 Logger.info("========== [Starting script] ==========")
 Logger.info("=======================================")
 
-
-
-let bot = new Discord.Client({
-    intents: [
-        Discord.GatewayIntentBits.Guilds,
-        Discord.GatewayIntentBits.DirectMessageReactions,
-        Discord.GatewayIntentBits.DirectMessageTyping,
-        Discord.GatewayIntentBits.DirectMessages,
-        Discord.GatewayIntentBits.GuildBans,
-        Discord.GatewayIntentBits.GuildEmojisAndStickers,
-        Discord.GatewayIntentBits.GuildIntegrations,
-        Discord.GatewayIntentBits.GuildInvites,
-        Discord.GatewayIntentBits.GuildMembers,
-        Discord.GatewayIntentBits.GuildMessageReactions,
-        Discord.GatewayIntentBits.GuildMessageTyping,
-        Discord.GatewayIntentBits.GuildMessages,
-        Discord.GatewayIntentBits.GuildPresences,
-        Discord.GatewayIntentBits.GuildScheduledEvents,
-        Discord.GatewayIntentBits.GuildVoiceStates,
-        Discord.GatewayIntentBits.GuildWebhooks,
-        Discord.GatewayIntentBits.Guilds,
-        Discord.GatewayIntentBits.MessageContent
-    ],
-    partials: [
-        Discord.Partials.Channel,
-        Discord.Partials.GuildMember,
-        Discord.Partials.GuildScheduledEvent,
-        Discord.Partials.Message,
-        Discord.Partials.Reaction,
-        Discord.Partials.ThreadMember,
-        Discord.Partials.User
-    ],
+const bot = new Discord.Client({
+    intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MEMBERS, Discord.Intents.FLAGS.GUILD_BANS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.DIRECT_MESSAGES],
     presence: {
-      status: 'idle',
-      activity: {
-        name: `le démarrage...`,
-        type: 'WATCHING'
-      }
+        status: 'online',
+        activity: {
+            name: `${config.bot.prefix}referenceguild`,
+            type: 'LISTENING'
+        }
     }
-})
+});
+
+require("./localModules/ExtendedMessages")
 
 
 function isSuperAdmin(id) {
@@ -139,6 +108,33 @@ Object.size = function(arr) {
     return size;
 };
 
+/*
+let data = new SlashCommandBuilder()
+    .setName("ping")
+    .setDescription("AHHAAHAH PING PONG")
+
+
+
+bot.on("ready", async () => {
+    Logger.log("Bot démarré.")
+
+    let guild = await bot.guilds.cache.get("909168225936363601")
+    let commands
+
+    if(guild) {
+        commands = guild.commands
+    } else {
+        commands = bot.application?.commands
+    }
+
+    Logger.log("commands")
+    Logger.log(commands)
+    Logger.log(guild)
+    commands?.create(data)
+    
+})
+
+*/
 
 
 Logger.info("Tentative de connection à MongoDB...")
@@ -154,159 +150,6 @@ MongoClient.connect(url, function(err, Mongo) {
 function _allCode() {
     /*
     */
-
-
-    bot.commands = {}
- 
-    bot.on("ready", () => {
-            
-        bot.commands.slashCommands = new Discord.Collection();
-
-        let SlashCommandsCollection = []
-        
-        try {
-            fs.readdirSync("./bot/slashcommands").forEach(file => {
-                if(file.endsWith(".js")) {
-                    try {
-                        let fileName = file.split(".")
-                        fileName.pop()
-                        fileName.join(".")
-        
-                        temp = require(`./bot/slashcommands/${fileName}`)
-                        SlashCommandsCollection.push({
-                            commandInformations: temp.commandInformations,
-                            require: temp
-                        });
-                        bot.commands.slashCommands.set(temp.commandInformations.commandDatas.name, {
-                            commandInformations: temp.commandInformations,
-                            require: temp
-                        });
-                        Logger.info(`✔ Successfully loaded command ${temp.commandInformations.commandDatas.name}`)
-                    } catch(e) {
-                        Logger.warn(`❌ Failed loading command of file /slashcommands/${file}`,e)
-                    }
-                }
-            });
-
-            if(config.bot.setApplicationCommandsOnStart) {
-                Logger.warn("❕ Penser à désactiver le config.bot.setApplicationCommandsOnStart pour ne pas recharger les commandes à chaque démarrage.")
-                let commandDatas_ = SlashCommandsCollection.map(x => { return x.commandInformations.commandDatas })
-                if(config.bot.setApplicationCommandsInLocal) {
-                    for(let i in config.bot.setApplicationCommandsInLocal_guilds) {
-                        let guild = bot.guilds.cache.get(config.bot.setApplicationCommandsInLocal_guilds[i])
-                        try {
-                            guild.commands.set(commandDatas_)
-                            Logger.info(`✔ Successfully reloaded guild commands for ${guild.name} (${guild.id})`)
-                        } catch(e) {
-                            try {
-                                Logger.warn(`❌ Failed to reload guild commands for ${guild.name} (${guild.id})`,e)
-                            } catch(err) {
-                                Logger.warn(`❌❌ Failed to reload guild commands for UNKNOW guild`,e)
-                            }
-                        }
-                    }
-                } else {
-                    try {
-                        bot.application.commands.set(commandDatas_)
-                        Logger.info(`✔ Successfully reloaded global application commands.`)
-                    } catch(e) {
-                        Logger.warn(`❌ Failed to reload global application commands.`,e)
-                    }
-                }
-            }
-            Logger.info("✅ Chargement des slash commandes terminé")
-
-        } catch(e) {
-            Logger.debug(e)
-        }
-    })
-
-
-
-    bot.on("interactionCreate", async (interaction) => {
-
-        if(!interaction.guild) return;
-        if(interaction.user.bot) return;
-
-        interaction.guild.me_ = () => { return interaction.guild.members.cache.get(bot.user.id) }
-
-        Logger.debug("interaction",interaction)
-    
-        let data = await Database.getGuildDatas(interaction.guild.id)
-    
-        Logger.debug("Got interaction: "+interaction)
-    
-        if(!interaction.isCommand()) return;
-    
-        if(!interaction.command) {
-            return interaction.reply({
-                content: ":x: Commande inconnue. [code#01]",
-                ephemeral: true
-            })
-        }
-
-    
-        /*
-        let filtered = SlashCommandsCollection.filter(x => {
-            return x.commandInformations.commandDatas.name == interaction.command.name
-        })
-        */
-    
-        let cmd = bot.commands.slashCommands.get(interaction.command.name)
-    
-        if(!cmd) {
-            return interaction.reply({
-                content: `:x: Commande non prise en charge.`,
-                ephemeral: true
-            })
-        }
-        let hasPerm_bot = botf.checkPermissions(cmd.require.commandInformations.permisionsNeeded.bot, interaction.guild.me_(), true)
-        console.log(`BOT checking perms: ${cmd.require.commandInformations.permisionsNeeded.bot} : `,hasPerm_bot)
-        let hasPerm_user = botf.checkPermissions(cmd.require.commandInformations.permisionsNeeded.user, interaction.member)
-        console.log(`BOT checking perms: ${cmd.require.commandInformations.permisionsNeeded.user} : `,hasPerm_user)
-
-        if(!hasPerm_bot.havePerm) {
-            return interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setColor("FF0000")
-                        .setTitle(`🤖 Aie.. Le bot manque de permissions!`)
-                        .setDescription(`Il a besoin des permissions suivantes:\n${hasPerm_bot.missingPermissions.map((x) => {
-                            return `\`${x}\``
-                        }).join(", ")}`)
-                        .setFooter({ text: `Essayez de contacter un administrateur.` })
-                ],
-                ephemeral: false
-            })
-        }
-        if(!hasPerm_user.havePerm) {
-            return interaction.reply({
-                content: `⛔ Halte! Tu n'a pas la permission d'utiliser cette commande.\nIl te manque une de ces permissions: ${cmd.require.commandInformations.permisionsNeeded.user.map((x) => {
-                    return `\`${x}\``
-                }).join(", ")}`,
-                ephemeral: true
-            })
-        }
-
-
-        cmd.require.execute(bot, interaction, data)
-
-    })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     let server = require("./server")
     server.run(bot)
@@ -408,7 +251,7 @@ function _allCode() {
     })
 
 
-    bot.on("messageCreate", async (message) => {
+    bot.on("message", async (message) => {
         //if (inDev) return Logger.log("Message got, but in local dev")
         keepAliveDatas.push({
             author: message.author,
@@ -422,7 +265,6 @@ function _allCode() {
         if (message.author.bot) return;
         if (!message.guild) return;
 
-        message.guild.me_ = () => { return message.guild.members.cache.get(bot.user.id) }
         
         if (inDev) {
             Logger.log("[message] message got, but in local dev so dont add it")
@@ -433,7 +275,7 @@ function _allCode() {
         if(Math.random() < 0.1) { Database.updateDiscordDatas(message.guild) }
 
         if (message.mentions.has(bot.user) && !message.mentions.everyone) {
-            return message.reply(`✨ Hey! My prefix is \`${config.bot.prefix}\`. Type \`${config.bot.prefix}help\` to see the help panel. `).then(msg => { setTimeout(() => { msg.delete() }, 5 * 60 * 1000) })
+            return message.inlineReply(`✨ Hey! My prefix is \`${config.bot.prefix}\`. Type \`${config.bot.prefix}help\` to see the help panel. `).then(msg => { setTimeout(() => { msg.delete() }, 5 * 60 * 1000) })
         }
 
         //if(message.author.id != "770334301609787392") return;
@@ -471,14 +313,14 @@ function _allCode() {
 
             let command_string = command_string_list.join("\n")
 
-            message.reply({ embeds:[
-                new EmbedBuilder()
+            message.inlineReply(
+                new MessageEmbed()
                     .setTitle("Page d'aide")
                     .setColor("FFFFFD")
                     .setDescription(command_string)
-                    .setFooter({ text: "Référencement officiel des Discords DirtyBiologistanais."})
+                    .setFooter("Référencement officiel des Discords DirtyBiologistanais.")
                     .setTimestamp()
-            ]})
+            )
 
             return;
         } else if (command == "ping") {
@@ -498,19 +340,19 @@ function _allCode() {
             return;
         } else if (command == "list") {
             let serverCount = server.getCachedDiscords().length
-            message.reply("a",
-                new EmbedBuilder()
+            message.inlineReply(
+                new MessageEmbed()
                     .setColor("#4444FF")
                     .setDescription(`${serverCount} serveurs référencé, [consulter la liste des serveurs de la micronation 🌎](${config.website.url})`)
-                    .setFooter({ text: "Référencement officiel des Discords DirtyBiologistanais."})
+                    .setFooter("Référencement officiel des Discords DirtyBiologistanais.")
                     .setTimestamp()
             )
             return
         } else if (command == "info") {
-            return message.reply(`:x: Cette commande n'est pas encore disponible.`)
+            return message.inlineReply(`:x: Cette commande n'est pas encore disponible.`)
             return;
         } else if (command == "search") {
-            return message.reply(`:x: Cette commande n'est pas encore disponible.`)
+            return message.inlineReply(`:x: Cette commande n'est pas encore disponible.`)
 
         } else if (command == "unreferenceguild") {
 
@@ -521,18 +363,18 @@ function _allCode() {
             }
 
             if (!haveOnePerm && !isSuperAdmin(message.author.id)) {
-                return message.reply(`Vous n'avez pas la permission d'utiliser cette commande. \`ADMINISTRATOR\` or \`MANAGE_GUILD\` `)
+                return message.inlineReply(`Vous n'avez pas la permission d'utiliser cette commande. \`ADMINISTRATOR\` or \`MANAGE_GUILD\` `)
             }
 
             let traitement_en_cours = `${config.emojis.loading.tag} Traitement de la demande en cours...`
-            let msg = await message.reply(traitement_en_cours)
+            let msg = await message.inlineReply(traitement_en_cours)
             setTimeout(() => {
                 if (msg.content == traitement_en_cours) msg.content = `${config.emojis.no.tag} La requête a pris trop de temps. Réessayez ultérieurement.`
             }, 60 * 1000)
 
             let isReferenced = await Database.isReferencedGuild(message.guild.id)
             if (!isReferenced) {
-                message.reply(`:x: Ce serveur n'est déjà pas référencé.`)
+                message.inlineReply(`:x: Ce serveur n'est déjà pas référencé.`)
                 return;
             }
 
@@ -572,11 +414,11 @@ function _allCode() {
             }
 
             if (!haveOnePerm && !isSuperAdmin(message.author.id)) {
-                return message.reply(`Vous n'avez pas la permission d'utiliser cette commande. \`ADMINISTRATOR\` or \`MANAGE_GUILD\` `)
+                return message.inlineReply(`Vous n'avez pas la permission d'utiliser cette commande. \`ADMINISTRATOR\` or \`MANAGE_GUILD\` `)
             }
 
             let traitement_en_cours = `${config.emojis.loading.tag} Traitement de la demande en cours...`
-            let msg = await message.reply(traitement_en_cours)
+            let msg = await message.inlineReply(traitement_en_cours)
             setTimeout(() => {
                 if (msg.content == traitement_en_cours) msg.content = `${config.emojis.no.tag} La requête a pris trop de temps. Réessayez ultérieurement.`
             }, 60 * 1000)
@@ -722,10 +564,10 @@ function _allCode() {
                                 ].join("\n")
 
                                 msg2.edit(done_msg,
-                                    new EmbedBuilder()
+                                    new MessageEmbed()
                                         .setColor("#4444FF")
                                         .setDescription(`[Liste des serveurs de la micronation 🌎](${config.website.url})\n**Informations additionnelles:**\nLogs:\`\`\`\n${back_msg_actions.join('\n')}\`\`\` `)
-                                        .setFooter({ text: "Référencement officiel des Discords DirtyBiologistanais."})
+                                        .setFooter("Référencement officiel des Discords DirtyBiologistanais.")
                                         .setTimestamp()
                                 )
 
@@ -734,15 +576,15 @@ function _allCode() {
                                 console.log(err)
 
                                 msg1.edit(`${config.emojis.no.tag} Une erreur est survenue durant le référencement du Discord. Si l'erreur persiste contactez le développeur du bot.`)
-                                msg1.reply("a",
-                                    new EmbedBuilder()
+                                msg1.inlineReply(
+                                    new MessageEmbed()
                                         .setColor("#4444FF")
                                         .setDescription(`🌎 Liste des serveurs de la micronation: ${config.website.url}\n**Informations additionnelles:**\nErreur: \`\`\`js\n${err}\`\`\` \nLogs:\`\`\`\n${back_msg_actions.join('\n')}\`\`\` `)
-                                        .setFooter({ text: "Référencement officiel des Discords DirtyBiologistanais."})
+                                        .setFooter("Référencement officiel des Discords DirtyBiologistanais.")
                                         .setTimestamp()
                                 ).catch(e => {
                                     back_msg_actions.push(`An error occured while handling error: Can't send embed message.`)
-                                    msg1.reply(`[Liste des serveurs de la micronation 🌎](${config.website.url})\n**Informations additionnelles:**\nErreur: \`\`\`js\n${err}\`\`\` \nLogs:\`\`\`\n${back_msg_actions.join('\n')}\`\`\` `)
+                                    msg1.inlineReply(`[Liste des serveurs de la micronation 🌎](${config.website.url})\n**Informations additionnelles:**\nErreur: \`\`\`js\n${err}\`\`\` \nLogs:\`\`\`\n${back_msg_actions.join('\n')}\`\`\` `)
                                 })
 
 
@@ -773,11 +615,11 @@ function _allCode() {
             }
 
             if (!haveOnePerm && !isSuperAdmin(message.author.id)) {
-                return message.reply(`Vous n'avez pas la permission d'utiliser cette commande. \`ADMINISTRATOR\` or \`MANAGE_GUILD\` `)
+                return message.inlineReply(`Vous n'avez pas la permission d'utiliser cette commande. \`ADMINISTRATOR\` or \`MANAGE_GUILD\` `)
             }
 
             let traitement_en_cours = `${config.emojis.loading.tag} Traitement de la demande en cours...`
-            let msg = await message.reply(traitement_en_cours)
+            let msg = await message.inlineReply(traitement_en_cours)
             setTimeout(() => {
                 if (msg.content == traitement_en_cours) msg.content = `${config.emojis.no.tag} La requête a pris trop de temps. Réessayez ultérieurement.`
             }, 60 * 1000)
@@ -792,8 +634,8 @@ function _allCode() {
                 let new_description = args.join(" ")
                 let maxLength = 255
                 if(new_description.length > maxLength) {
-                    msg.edit("a",
-                        new EmbedBuilder()
+                    msg.edit(
+                        new MessageEmbed()
                             .setColor("FF0000")
                             .setDescription(`${config.emojis.no.tag} La description doit faire au maximum ${maxLength} caractère, la votre en fait ${new_description.length} !\n${new_description.substr(0,maxLength)}__${new_description.substr(maxLength,new_description.length)}__`)
                     )
@@ -801,8 +643,8 @@ function _allCode() {
                 }
                 await Database.set_descriptionGuildByID(message.guild.id, new_description)
                 
-                msg.edit("a",
-                    new EmbedBuilder()
+                msg.edit(``,
+                    new MessageEmbed()
                         .setColor("00FF00")
                         .setDescription(`${config.emojis.check_mark.tag} La description a été changée pour \`\`\`${new_description}\`\`\` `)
                 )
@@ -813,7 +655,7 @@ function _allCode() {
 
         
         } else if(command == "checkperms") {
-            let checkedPerms = botf.checkPermissionList(message.guild.me_())
+            let checkedPerms = somef.checkPermissionList(message.guild.me)
             message.channel.send(`Le bot necessite la permission | le bot a la permission\n${checkedPerms.list.join("\n")}`)
             if(checkedPerms.permissions_missing.length > 0) {
                 message.channel.send(`Liste des permissions manquantes au bot: \`${checkedPerms.permissions_missing.join("\`, \`")}\` `)
@@ -822,9 +664,9 @@ function _allCode() {
         } else if (command == "test") {
             if (!isSuperAdmin(message.author.id)) return;
 
-            message.channel.send("a",
+            message.channel.send(
 
-                new EmbedBuilder()
+                new MessageEmbed()
                     .setTitle(`Référencement des Discords DirtyBiologistanais`)
                     .setColor("#4444FF")
                     .setDescription(`Merci d'avoir ajouté le bot.\n\n__**Configurer le bot:**__\n\nLe préfix est \`${config.bot.prefix}\`. Faites \`${config.bot.prefix}help\` pour afficher les commandes.
@@ -840,13 +682,13 @@ function _allCode() {
         🌎 Sites: [Liste des serveurs de la micro-nation](${config.website.url}) • [site du DirtyBiologistan](https://DirtyBiology.captaincommand.repl.co) • [dirtybiologistan.com](https://dirtybiologistan.com)
         🔵 Discords: [Centre de renseignement](https://discord.gg/em9caYCg7D) • [Assistance des bots](https://discord.gg/hVh74Y4CgT) • [RPDB](https://discord.gg/hVh74Y4CgT) • [ORU](https://discord.gg/ZWHdEKxe7w) 
         `)
-                    .setFooter({ text: "Référencement officiel des Discords DirtyBiologistanais."})
+                    .setFooter("Référencement officiel des Discords DirtyBiologistanais.")
                     .setTimestamp()
             )
         } else if (command == "certify") {
-            if (!isSuperAdmin(message.author.id)) return message.reply(`Vous n'avez pas la permission d'utiliser cette commande. \`SUPER_ADMIN\` `)
+            if (!isSuperAdmin(message.author.id)) return message.inlineReply(`Vous n'avez pas la permission d'utiliser cette commande. \`SUPER_ADMIN\` `)
 
-            if (!args[0]) return message.reply(`Erreur de syntaxe: \`${config.bot.prefix}certify <guild_id>\` `)
+            if (!args[0]) return message.inlineReply(`Erreur de syntaxe: \`${config.bot.prefix}certify <guild_id>\` `)
 
             guild_id = args[0]
 
@@ -856,27 +698,27 @@ function _allCode() {
                 let isCertified = await Database.isCertifiedGuild(guild_id)
                 if (isCertified) {
                     Database.set_certifiedGuildByID(guild_id, false)
-                    message.reply("a",
-                        new EmbedBuilder()
+                    message.inlineReply(
+                        new MessageEmbed()
                             .setColor("FF0000")
                             .setDescription(`La guilde **${isReferenced_guildMongoDbObject.guild.name}** n'est désormais plus certifiée.`)
                     )
                     return;
                 } else {
                     Database.set_certifiedGuildByID(guild_id, true)
-                    message.reply("a",
-                        new EmbedBuilder()
+                    message.inlineReply(
+                        new MessageEmbed()
                             .setColor("00FF00")
                             .setDescription(`La guilde **${isReferenced_guildMongoDbObject.guild.name}** est maintenant certifiée ${config.emojis.check_mark.tag}.`)
                     )
                     return;
                 }
             } else {
-                return message.reply(`:x: La guilde avec l'ID \`${guild_id}\` n'est pas référencée ou l'ID est invalide.`)
+                return message.inlineReply(`:x: La guilde avec l'ID \`${guild_id}\` n'est pas référencée ou l'ID est invalide.`)
             }
         } else if (command == "forcerefresh") {
-            if (!isSuperAdmin(message.author.id)) return message.reply(`Vous n'avez pas la permission d'utiliser cette commande. \`SUPER_ADMIN\` `)
-            message.reply(`${config.emojis.loading.tag} Rafraîchissement du cache...`).then(async msg => {
+            if (!isSuperAdmin(message.author.id)) return message.inlineReply(`Vous n'avez pas la permission d'utiliser cette commande. \`SUPER_ADMIN\` `)
+            message.inlineReply(`${config.emojis.loading.tag} Rafraîchissement du cache...`).then(async msg => {
                 let discordCached = await server.refreshDiscords_cache()
                 msg.edit(`${config.emojis.check_mark.tag} Opération terminée, ${discordCached.length} discords rafraîchis en cache.`)
             }).catch(e => {
@@ -886,9 +728,9 @@ function _allCode() {
             return;
 
         } else if (command == "forcediscorddataupdate") {
-            if (!isSuperAdmin(message.author.id)) return message.reply(`Vous n'avez pas la permission d'utiliser cette commande. \`SUPER_ADMIN\` `)
+            if (!isSuperAdmin(message.author.id)) return message.inlineReply(`Vous n'avez pas la permission d'utiliser cette commande. \`SUPER_ADMIN\` `)
             
-            message.reply(`${config.emojis.loading.tag} Rafraîchissement des informations de tous les serveurs discord...`).then(async msg => {
+            message.inlineReply(`${config.emojis.loading.tag} Rafraîchissement des informations de tous les serveurs discord...`).then(async msg => {
                 await Database.updateDiscordDatas_allGuilds()
                 msg.edit(`${config.emojis.check_mark.tag} Opération terminée, les données de ${discordCached.length} discords ont été rafraîchies.`)
             }).catch(e => {
@@ -906,11 +748,11 @@ function _allCode() {
             }
 
             if (!haveOnePerm && !isSuperAdmin(message.author.id)) {
-                return message.reply(`Vous n'avez pas la permission d'utiliser cette commande. \`ADMINISTRATOR\` or \`MANAGE_GUILD\` `)
+                return message.inlineReply(`Vous n'avez pas la permission d'utiliser cette commande. \`ADMINISTRATOR\` or \`MANAGE_GUILD\` `)
             }
 
             let traitement_en_cours = `${config.emojis.loading.tag} Traitement de la demande en cours...`
-            let msg = await message.reply(traitement_en_cours)
+            let msg = await message.inlineReply(traitement_en_cours)
             setTimeout(() => {
                 if (msg.content == traitement_en_cours) msg.content = `${config.emojis.no.tag} La requête a pris trop de temps. Réessayez ultérieurement.`
             }, 60 * 1000)
@@ -927,16 +769,16 @@ function _allCode() {
 
             if (isPrivate) {
                 Database.set_privateGuildByID(guild_id, false)
-                msg.edit("a",
-                    new EmbedBuilder()
+                msg.edit(``,
+                    new MessageEmbed()
                         .setColor("00FF00")
                         .setDescription(`${config.emojis.check_mark.tag}🌎 Le Discord **${isReferenced_guildMongoDbObject.guild.name}** est désormais public. Un lien d'invitation permanent vers ce Discord est disponible sur le [site web](${config.website.url}).\nL'actualisation sur le site peut prendre jusqu'à 1h.`)
                 )
                 return;
             } else {
                 Database.set_privateGuildByID(guild_id, true)
-                msg.edit("a",
-                    new EmbedBuilder()
+                msg.edit(``,
+                    new MessageEmbed()
                         .setColor("FF0000")
                         .setDescription(`${config.emojis.check_mark.tag}⛔ Le Discord **${isReferenced_guildMongoDbObject.guild.name}** est maintenant privé, il n'est donc plus possible de le rejoindre par le [site web](${config.website.url}).\nAttention, le lien d'invitation continuera à être actualisé si besoin, même si il ne servira pas.\nL'actualisation sur le site peut prendre jusqu'à 1h.`)
                 )
@@ -979,14 +821,14 @@ function _allCode() {
 
         let subtext = []
         
-        let checkedPerms = botf.checkPermissionList(message.guild.me_())
+        let checkedPerms = somef.checkPermissionList(message.guild.me)
 
         if(checkedPerms.permissions_missing.length > 0) {
             subtext.push(`:warning: Attention, le bot ne possède pas toutes les permissions necessaire, celà peut empêcher son fonctionnement, merci de lui donner les permissions spécifiées dans la commande \`${config.bot.prefix}checkperms\` `)
         }
 
-        one_channel.send("a",
-            new EmbedBuilder()
+        one_channel.send(
+            new MessageEmbed()
                 .setTitle(`Référencement des Discords DirtyBiologistanais`)
                 .setColor("#4444FF")
                 .setDescription(`Merci d'avoir ajouté le bot.\n\n__**Configurer le bot:**__\n\nLe préfix est \`${config.bot.prefix}\`. Faites \`${config.bot.prefix}help\` pour afficher les commandes.
@@ -1004,7 +846,7 @@ function _allCode() {
             🌎 Sites: [Liste des serveurs de la micro-nation](${config.website.url}) • [site du DirtyBiologistan](https://DirtyBiology.captaincommand.repl.co) • [dirtybiologistan.com](https://dirtybiologistan.com)
             🔵 Discords: [Centre de renseignement](https://discord.gg/em9caYCg7D) • [Assistance des bots](https://discord.gg/hVh74Y4CgT) • [RPDB](https://discord.gg/hVh74Y4CgT) • [ORU](https://discord.gg/ZWHdEKxe7w) 
             `)
-                .setFooter({ text: "Référencement officiel des Discords DirtyBiologistanais."})
+                .setFooter("Référencement officiel des Discords DirtyBiologistanais.")
                 .setTimestamp()
         )
 

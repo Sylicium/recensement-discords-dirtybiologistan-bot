@@ -20,6 +20,7 @@ app.get(`/*`, (req, res) => {
 */
 
 app.get(`*`, (req, res) => {
+
     Logger.log("Request to url:",req.path)
     res.sendFile(`${__dirname}/site/${req.path}`)
 
