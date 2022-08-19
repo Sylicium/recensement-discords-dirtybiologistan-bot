@@ -32,10 +32,10 @@ app.get(`*`, (req, res) => {
 
 app.put("/api/dbsapiback", async (req,res) => {
     try {
-        Logger.warn("[API]: (PUT) api/dbsapiback -> got request:",req)
+        Logger.warn("[API]: (PUT) api/dbsapiback -> got request:")
 
         if(req.body.backBody.refdbg_api_token != config.api.me.api_token) {
-            Logger.warn("[API]: Invalid api_token provided",req)
+            Logger.warn("[API]: Invalid api_token provided")
             return res.send({ status: 401, message: "Unauthorized." })
         }
 
@@ -66,6 +66,8 @@ app.put("/api/dbsapiback", async (req,res) => {
             [`keywords`]: ((typeof ref_category.keywords == "string") ? ref_category.keywords.split(",").map((item,index) => { return item.trim().toLowerCase()}) : guildInfos.guild.keywords),
         })
 
+        Logger.info("[API]: All is good on the route. (PUT) /api/dbsapiback | ref_category:",ref_category)
+        
         res.send({
             status: 200
         })
