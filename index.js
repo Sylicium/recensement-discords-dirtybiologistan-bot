@@ -171,6 +171,10 @@ function _allCode() {
     /*
     */
 
+    bot.on("debug", (...args) => {
+        Logger.debug("[BOT.debug]",...args)
+    })
+
 
     bot.commands = {}
     bot.commands.slashCommands = new Discord.Collection();
@@ -527,6 +531,8 @@ function _allCode() {
                     .setDescription(temp_lines)
                     .setFooter({ text: "Bot de référencement officiel des Discords DirtyBiologistanais." })
             ]
+        }).then(msg => {
+            setTimeout(() => { msg.delete()}, 60*1000)
         })
         /********************/
 
