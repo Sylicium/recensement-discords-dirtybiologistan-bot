@@ -24,7 +24,7 @@ module.exports = {
         superAdminOnly: true,
         disabled: false,
         indev: false,
-        hideOnHelp: false
+        hideOnHelp: true
     },
     execute: async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h) => {
         

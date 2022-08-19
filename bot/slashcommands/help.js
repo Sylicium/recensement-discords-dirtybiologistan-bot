@@ -15,8 +15,8 @@ module.exports = {
             type: Discord.ApplicationCommandType.ChatInput,
             options: [
                 {
-                    "name": "usable",
-                    "description": "Afficher uniquement les commandes que je peux utiliser",
+                    "name": "all",
+                    "description": "Afficher toutes les commandes, même que je ne peux pas utiliser",
                     "type": 5,
                     "required": false
                 }
@@ -38,27 +38,103 @@ module.exports = {
 
         await interaction.deferReply({ ephemeral: true })
 
-        let commands = bot.commands.slashCommands.map((item, index) => {
-            if(!item.commandInformations.hideOnHelp) {
-                return { name: item.commandInformations.commandDatas.name, description: item.commandInformations.commandDatas.description, commandInformations: item.commandInformations }
+
+        let isUserSuperAdmin = Modules.somef.isSuperAdmin(interaction.user.id)
+
+        function needAdministrativePermissions(cmd) {
+            let userPerms = Modules.botf.getBitFieldPermission(cmd.commandInformations.permisionsNeeded.user)
+            let perms = Modules.botf.getBitFieldPermission([ "ADMINISTRATOR", "MANAGE_GUILD" ])
+            for(let i in perms) {
+                if(userPerms.indexOf(perms[i]) != -1) {
+                    return true
+                }
             }
+            return false
+        }
+
+        function getCommandIcon(cmd) {
+            if(cmd.commandInformations.hideOnHelp) return "👻"
+            else if(cmd.commandInformations.superAdminOnly) return "⛔"
+            else if(cmd.commandInformations.disabled) return "❌"
+            else if(cmd.commandInformations.indev) return "🛠"
+            else if(cmd.commandInformations.permisionsNeeded.user.length == 0) return " "
+            else if(cmd.havePermToUseCmd) return "🔑"
+            else if(needAdministrativePermissions(cmd)) return "🔒"
+            else if(!cmd.havePermToUseCmd) return "🔐"
+            else return ""
+        }
+
+        let commands = bot.commands.slashCommands.filter((item, index) => {
+            if(!item.commandInformations.hideOnHelp || isUserSuperAdmin) return true
+            return false
+        }).map((item, index) => {
+            return {
+                icon: "",
+                name: item.commandInformations.commandDatas.name,
+                description: item.commandInformations.commandDatas.description,
+                commandInformations: item.commandInformations,
+                havePermToUseCmd: Modules.botf.checkPermissions(item.commandInformations.permisionsNeeded.user, interaction.member).havePerm
+            }
+        }).map((item, index) => {
+            let temp = JSON.parse(JSON.stringify(item))
+            temp.icon = getCommandIcon(item)
+            return temp
         })
 
-        if(interaction.options.get("usable") && interaction.options.get("usable").value == true) {
+        commands = commands.sort((a,b) => {
+            return a.name.localeCompare(b.name)
+        })
+
+        let command_string_list = [
+        ]     
+
+        if(!interaction.options.get("all") || interaction.options.get("all").value == false) {
+
+            command_string_list = command_string_list.concat([
+                `${config.emojis.check_mark.tag} Vous pouvez utiliser toutes ces commandes`,
+                ``,
+            ])
+
             commands = commands.filter((item) => {
-                if(!Modules.somef.isSuperAdmin(interaction.user.id) && (
+                if(!isUserSuperAdmin && (
                         item.commandInformations.superAdminOnly
                         || item.commandInformations.indev
                         || item.commandInformations.disabled
                     )
                 ) { return false } else {
-                    let permission = Modules.botf.checkPermissions(item.commandInformations.permisionsNeeded.user, interaction.member)
-                    if(permission.havePerm) {
+                    if(item.havePermToUseCmd) {
                         return true
                     } else { return false }
                 }
             })
+        } else {
+            command_string_list = command_string_list.concat([
+                `⛔ Commande superAdmin | ❌ Commande désactivée`,
+                `🛠 Commande en développement | 🔒 Requiert des permissions d'Administration`,
+                `🔐 Requiert plus de permission pour utiliser | 🔑 Requiert des permissions que vous avez`,
+                `${isUserSuperAdmin ? `👻 hideOnHelp = true\n` : ""}`
+            ])
         }
+
+        function getAdminDisabledCmdValue(item) {
+            if(item.commandInformations.superAdminOnly) return 3
+            else if(item.commandInformations.disabled) return 2
+            else if(item.commandInformations.indev) return 1
+            else return 0
+        }
+
+        commands = commands.sort((a,b) => {
+            let t_a = getAdminDisabledCmdValue(a)
+            let t_b = getAdminDisabledCmdValue(b)
+
+            let temp = t_b - t_a
+
+            if(temp > 0) {
+                return -1
+            } else if(temp < 0) {
+                return 1
+            } else { return 0 }
+        })
 
         /*let commands = [
             { name: "help", description: "Afiicher cette page d'aide" },
@@ -73,10 +149,9 @@ module.exports = {
             { name: "search", description: ":x: Rechercher un discord parmis la liste. (Pas encore disponible)" },
             { name: "certify", description: "⛔ [développeur] Permet de certifier une guilde" },
             { name: "forcerefresh", description: "⛔ [développeur] Permet de forcer la rafaîchissement des discords sur le site" }
-        ]*/
-        let command_string_list = []        
+        ]*/   
         for (let i in commands) {
-            command_string_list.push(`\`${commands[i].name}\` : *${commands[i].description}*`)
+            command_string_list.push(`${commands[i].icon} \`${commands[i].name}\` : *${commands[i].description}*`)
         }
 
         let command_string = command_string_list.join("\n")
@@ -87,7 +162,9 @@ module.exports = {
                     .setTitle("Page d'aide")
                     .setColor("FFFFFD")
                     .setDescription(command_string)
-                    .setFooter({ text: "Référencement officiel des Discords DirtyBiologistanais."})
+                    .setFooter({ text: `${(interaction.options.get("all") ? `${
+                        (interaction.options.get("all").value == true) ? "Affiche uniquement les commandes que vous pouvez faire" : "Affiche toute les commandes"
+                    }` : `💡 Utilise l'option all:Trie pour afficher même les commandes auxquelles tu n'as pas accès`)}`})
                     .setTimestamp()
             ],
             ephemeral: true

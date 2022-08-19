@@ -22,7 +22,7 @@ let commandInformations = {
     rolesNeeded: [],
     superAdminOnly: false,
     disabled: false,
-    indev: true,
+    indev: false,
     hideOnHelp: false
 }
 module.exports.commandInformations = commandInformations

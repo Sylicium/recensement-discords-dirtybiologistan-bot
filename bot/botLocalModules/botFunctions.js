@@ -5,6 +5,7 @@ const { PermissionsBitField } = Discord
 
 module.exports.checkPermissions = checkPermissions
 function checkPermissions(permissionList, Member, haveAll=false) {
+    if(!Array.isArray(permissionList)) permissionList = [permissionList]
     if(permissionList.length == 0) {
         return { missingPermissions: [], havePerm: true }
     }
@@ -117,7 +118,7 @@ module.exports.getBitFieldPermission = getBitFieldPermission
 function getBitFieldPermission(permNameOrList) {
     if(Array.isArray(permNameOrList)) {
         return permNameOrList.map((item, index) => {
-            this.getBitFieldPermission(item)
+            return this.getBitFieldPermission(item)
         })
     } else {
         if(typeof permNameOrList != "string") return permNameOrList
