@@ -73,7 +73,7 @@ module.exports = {
                 name: item.commandInformations.commandDatas.name,
                 description: item.commandInformations.commandDatas.description,
                 commandInformations: item.commandInformations,
-                havePermToUseCmd: Modules.botf.checkPermissions(item.commandInformations.permisionsNeeded.user, interaction.member).havePerm
+                havePermToUseCmd: (isUserSuperAdmin ?  true : Modules.botf.checkPermissions(item.commandInformations.permisionsNeeded.user, interaction.member).havePerm)
             }
         }).map((item, index) => {
             let temp = JSON.parse(JSON.stringify(item))

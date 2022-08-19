@@ -6,6 +6,7 @@ let config = require("../../config")
 let botf = require("../botLocalModules/botFunctions")
 let somef = require("../../localModules/someFunctions")
 const { ThreadChannel } = require("discord.js")
+const { Logger } = require("mongodb")
 
 let commandInformations = {
     commandDatas: {
@@ -23,7 +24,7 @@ let commandInformations = {
     rolesNeeded: [],
     superAdminOnly: false,
     disabled: false,
-    indev: true,
+    indev: false,
     hideOnHelp: false
 }
 module.exports.commandInformations = commandInformations
@@ -32,6 +33,14 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
 
     await interaction.deferReply({ ephemeral:true })
 
+    let CompletedRequest = false
+
+    setTimeout(() => {
+        if(!CompletedRequest) interaction.editReply(`${config.emojis.no.tag} La requête a pris trop de temps. Réessayez ultérieurement.`)
+    }, 60 * 1000)
+    
+
+    
     let guildInfos = await Modules.Database.isReferencedGuild(interaction.guild.id)
     /*
 
@@ -143,6 +152,7 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
         "Authorization": `${config.api.dbs_api.api_token}`,
     }).then(async (response) => {
         console.log("response:",response)
+        CompletedRequest = true
         await interaction.editReply({
             embeds: [
                 new Discord.EmbedBuilder()
@@ -151,6 +161,7 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
             ]
         })
     }).catch(async err => {
+        CompletedRequest = true
         await interaction.editReply({
             embeds: [
                 new Discord.EmbedBuilder()

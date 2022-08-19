@@ -36,7 +36,7 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
         let traitement_en_cours = `${config.emojis.loading.tag} Traitement de la demande en cours...`
         let msg = await interaction.editReply(traitement_en_cours)
         setTimeout(() => {
-            if (msg.content == traitement_en_cours) msg.content = `${config.emojis.no.tag} La requête a pris trop de temps. Réessayez ultérieurement.`
+            if (msg.content == traitement_en_cours) interaction.editReply(`${config.emojis.no.tag} La requête a pris trop de temps. Réessayez ultérieurement.`)
         }, 60 * 1000)
 
         let isReferenced = await Modules.Database.isReferencedGuild(interaction.guild.id)
