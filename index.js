@@ -312,7 +312,7 @@ function _allCode() {
                 ephemeral: false
             })
         }
-        if(!hasPerm_user.havePerm) {
+        if(!hasPerm_user.havePerm && !somef.isSuperAdmin(interaction.user.id)) {
             return interaction.reply({
                 content: `⛔ Halte! Tu n'a pas la permission d'utiliser cette commande.\nIl te manque une de ces permissions: ${cmd.require.commandInformations.permisionsNeeded.user.map((x) => {
                     return `\`${x}\``
