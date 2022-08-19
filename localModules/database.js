@@ -3,7 +3,7 @@ const Logger = new (require("./logger"))()
 const MongoClient = require('mongodb').MongoClient;
 
 
-// v1.4.1 - 14/08/2022
+// v1.5.0 - 19/08/2022
 
 
 /*function getdb() {
@@ -80,6 +80,21 @@ class Database {
         return object
         if(object) return true
         return false
+    }
+
+    async editReferencedGuildDatas(guild_id, setFieldsAndValues) {
+        /*
+        setFieldsAndValues = {
+            [`${field}`]: value
+        }
+        */
+        await Database_.Mongo.db(this._usedDataBaseName).collection("discordsList").updateOne(
+            { "guild.id": guild_id },
+            {
+              $set: setFieldsAndValues
+            },
+            { upsert: false }
+        )
     }
 
     async referenceGuild(infos) {

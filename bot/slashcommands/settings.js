@@ -30,9 +30,7 @@ module.exports.commandInformations = commandInformations
     
 module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h) => {
 
-    await interaction.deferReply()
-
-    let link = "https://google.com"
+    await interaction.deferReply({ ephemeral:true })
 
     let guildInfos = await Modules.Database.isReferencedGuild(interaction.guild.id)
     /*
@@ -78,7 +76,7 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
         (guildInfos ? {
             "name": "Paramètres de référencement",
             "description": "Paramètres principaux",
-            "id": "main",
+            "id": "referencement",
             "submenu": [
                 {
                     "name": "Mode privé",
@@ -141,7 +139,7 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
         "backToEndpointToken": 'backToEndpointToken',
         "backToEndpointUrl": `${config.api.me.endpoints.dbsapiback.url}`,
         "oneUse": true,
-        "backBody": {"guild_id": interaction.guild.id, "user_id": interaction.user.id},
+        "backBody": {"guild_id": interaction.guild.id, "user_id": interaction.user.id, "refdbg_api_token":config.api.me.api_token },
         "Authorization": `${config.api.dbs_api.api_token}`,
     }).then(async (response) => {
         console.log("response:",response)

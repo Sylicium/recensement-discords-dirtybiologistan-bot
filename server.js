@@ -30,42 +30,56 @@ app.get(`*`, (req, res) => {
 
 })
 
-app.put("/api/dbsapiback", (req,res) => {
+app.put("/api/dbsapiback", async (req,res) => {
     try {
         Logger.warn("[API]: (PUT) api/dbsapiback -> got request:",req)
 
-        if(req.body) {
-            for(let key in req.body) {
-                try {
-                    if(typeof req.body[key] != "string") continue;
-                    req.body[key] = JSON.parse(req.body[key])
-                } catch(e) {
-                    Logger.error(`[API]: Internal server error while parsing body key '${key}'.`,e)
-                    return res.send({
-                        status: 500,
-                        message: `Internal server error while parsing body key '${key}'.`,
-                        error: `${e}`,
-                        stack: e.stack.split("\n"),
-                        request: { uri: req.url, path: req.path, query: req.query, method: req.method }
-                    })
-                }
-            }
+        if(req.body.backBody.refdbg_api_token != config.api.me.api_token) {
+            Logger.warn("[API]: Invalid api_token provided",req)
+            return res.send({ status: 401, message: "Unauthorized." })
         }
 
+        let guildInfos = await Database.isReferencedGuild(req.body.backBody.guild_id)
 
-
-
-        if(req.body.api_token != config.api.me.api_token) {
+        if(!guildInfos) {
+            Logger.warn("[API]: Guild ID not referenced")
             return res.send({
-                status: 401,
-                message: "Unauthorized."
+                status: 422,
+                message: "Not Acceptable"
             })
         }
-        
+
+        if(req.body.backBody.user_id != req.body.user.id) {
+            Logger.warn("[API]: User is not the same")
+            return res.send({
+                status: 422,
+                message: "Not Acceptable"
+            })
+        }
+
+        let ref_category = req.body.settings.json.referencement
+
+
+        await Database.editReferencedGuildDatas(guildInfos.guild.id, {
+            [`guild.description`]: (ref_category.description || guildInfos.guild.description),
+            [`settings.private`]: ((typeof ref_category.private == "boolean")? ref_category.private : guildInfos.guild.private),
+            [`keywords`]: ((typeof ref_category.keywords == "string") ? ref_category.keywords.split(",").map((item,index) => { return item.trim().toLowerCase()}) : guildInfos.guild.keywords),
+        })
+
+        res.send({
+            status: 200
+        })
+
     } catch(e) {
         Logger.warn("[API]: Error on request (PUT) /api/dbsapiback",e)
         Logger.warn(e.stack)
+        res.send({
+            status: 500,
+            message: `${e}`,
+            stack: e.stack
+        })
     }
+
 })
 
 
