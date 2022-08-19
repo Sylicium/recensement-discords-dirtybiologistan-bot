@@ -180,6 +180,7 @@ input.checkbox_1 {
     background: #db000055;
     background-size: 200%;
     background-position: left;
+    cursor: not-allowed;
 }
 #all_discords_list div.guild div.guild_buttons div.button_invalidURL_guild {
     border: solid 2px #858585;

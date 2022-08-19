@@ -5,56 +5,41 @@
 		DirtyBiologistan | Tous les Discords
 	</title>
 	<meta charset="utf-8">
-	<meta property="og:title" content="DirtyBiologistan | Tous les Discords">
-	<meta property="og:description" content="Liste de tous les Discords de la micronation">
-    <meta property="og:image" content="https://referencementdbg.gouv.repl.co/files/Drapeau_dirtybiologistan_hypothetique_discord.png">
-    <link rel="stylesheet" href="./style.css">
+	<!-- <meta property="og:title" content="DirtyBiologistan | Tous les Discords - Infos">
+	<meta property="og:description" content="Liste de tous les Discords de la micronation. Cliquez pour recenser votre Discord parmis tous ceux en lien avec la micro-nation ! - Ce bot N'EST PAS AFFILIÉ à la rpd.">
+    <!-- <meta property="og:image" content="https://referencementdbg.gouv.repl.co/files/discord_default_avatar_0.png"> -->
+    <!-- <meta property="og:image" content="https://referencementdbg.gouv.repl.co/files/Drapeau_dirtybiologistan_hypothetique_discord_carre.png"> -->
+
+    
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Bot du centre de renseignements">
+    <meta property="og:title" content="DirtyBiologistan | Tous les discords">
+    <meta property="og:description" content="Liste de tous les Discords de la micronation.
+        Cliquez pour recenser votre Discord parmis tous ceux en lien avec la micro-nation !
+        Ce bot N'EST PAS AFFILIÉ à la rpd.">
+    <meta property="og:image" content="https://referencementdbg.gouv.repl.co/files/Drapeau_dirtybiologistan_hypothetique_discord_carre.png">
+    
+    
 
 </head>
 
 <body>
 
     <div id="toasts"></div>
-    
-    <div class="sommaire">
-        <ul>
-            <li><a class="link" href="#why"><h1>Pourquoi ajouter le bot ?</h1></a></li>
-            <li><a class="link" href="#invite_bot"><h1>Inviter et configurer le bot</h1></a></li>
-            <li><a class="link" href="#commands"><h1>Commandes du bot</h1></a></li>
-        </ul>
-    </div>
 
-    <div id="why" class="informationbox">
-        <h2 class="title">Pourquoi ajouter le bot ?</h2>
-    </div>
-    <div id="invite_bot" class="informationbox">
-        <h2 class="title">Inviter et configurer le bot</h2>
-        <ul class="list">
-            <li><p class="medium_text">1️⃣ <a class="link" href="https://discord.com/api/oauth2/authorize?client_id=968799075686289409&permissions=294205643841&scope=bot%20applications.commands" target="_BLANK">Ajouter le bot</a></p></li>
-            <li><p class="medium_text">2️⃣ Quand le bot a rejoint, dirigez vous dans un channel et assurez vous que le bot y a accès en lecture et écriture (par exemple en @mentionnant le bot pour voir si il répond)</p></li>
-            <li><p class="medium_text">3️⃣ Effectuez la commande <span class="command">r!referenceguild</span> puis suivez les instructions.</p></li>
-            <li><p class="medium_text">✅ Bravo ! Votre serveur sera maintenant affiché sur ce site à la prochaine réactualisation (toutes les heures).</p></li>
-        </ul>
         
-        <p class="medium_text">Pour garder votre serveur privé et empêcher que l'on puisse le rejoindre en passant par le site, utilisez la commande <span class="command">r!setprivate</span> </p>
+    
+    <h1>
+        <a href="https://discord.com/api/oauth2/authorize?client_id=968799075686289409&permissions=2147601409&scope=bot%20applications.commands" target="_BLANK">Ajouter le bot pour référencer mon serveur</a>
+    </h1>
 
-    </div>
-    <div id="commands" class="informationbox">
-        <h2 class="title">Commandes du bot</h2>
-        <ul class="list">
-            <li><p class="medium_text">Bravo ! Votre serveur sera maintenant affiché sur ce site à la prochaine réactualisation.</p></li>
-        </ul>
 
-    </div>
+    
+        
 
 
 </body>
 <style>
-
-    html {
-        
-        scroll-behavior: smooth;
-    }
 
 	body {
 		background: #113;
@@ -123,124 +108,11 @@
         font-family: consolas;
 	}
 
-    a.link {
-        text-decoration: none;
-        color:aqua;
-    }
-    a.link:hover {
-        text-decoration: underline;
-    }
-
-    ul.list {
-        padding-left: 30px;
-    }
-
-    div.sommaire {
-        border-left: 2px solid white;
-        border-radius: 15px;
-        margin-left: 20px;
-    }
-
-    div.informationbox {
-        /*
-        border: 1px solid gray;
-        border-left: 2px solid rgb(186, 233, 58);
-        border-bottom:2px solid rgb(218, 206, 39);
-        */
-        border-radius: 10px;
-        margin: 30px auto;
-        margin-top: 150px;
-        margin-bottom: 150px;
-        padding: 5px 20px 5px 20px;
-        max-width: 1000px;
-    }
-    div.informationbox h2.title {
-        text-align: center;
-    }
-
-    span.command {
-        background-color: rgb(102, 0, 236);
-        color: rgb(255, 255, 255);
-        padding: 1px 8px 1px 8px;
-        border: 1px solid #000;
-        border-radius: 5px;
-        font-family: consolas;
-    }
-
-    .medium_text {
-        font-size: 2vh;
-        margin: 10px 0px 10px 0px;
-    }
-
 
 
 </style>
 
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="./basicFunctions.js"></script>
-
-<script>
-
-
-    let AllGuilds = [
-    {
-            "guild": {
-                "id": "909168225936363601",
-                "name": "Assistance bot ORU",
-                "iconURL": "https://cdn.discordapp.com/icons/909168225936363601/8085677e4d9c0859fa5cf0bf3b040d7d.webp",
-                "createdAt": 1636832996592
-            },
-            "friendlyName": "Assistance bot ORU",
-            "keywords": [ "assistance", "bot", "oru" ],
-            "owner": {
-                "id": "774003919625519134",
-                "username": "Sylicium",
-                "tag": "Sylicium#2487",
-                "discriminator": "2487"
-            },
-            "statistics": {
-                "messages": {
-                    "lastWeek": [],
-                    "lastMonth": []
-                }
-            },
-            "inviteURL": "https://discord.gg/dxpYfWq33v",
-            "isBotOnGuild": true,
-            "averageMembers": {
-                "total": 94,
-                "online": 23
-            }
-        },{
-            "guild": {
-                "id": "909168225936363601",
-                "name": "Assistance bot ORU",
-                "iconURL": "https://cdn.discordapp.com/icons/909168225936363601/8085677e4d9c0859fa5cf0bf3b040d7d.webp",
-                "createdAt": 1636832996592
-            },
-            "friendlyName": "Assistance bot ORU",
-            "keywords": [ "assistance", "bot", "oru" ],
-            "owner": {
-                "id": "774003919625519134",
-                "username": "Sylicium",
-                "tag": "Sylicium#2487",
-                "discriminator": "2487"
-            },
-            "statistics": {
-                "messages": {
-                    "lastWeek": [],
-                    "lastMonth": []
-                }
-            },
-            "inviteURL": "https://discord.gg/dxpYfWq33v",
-            "isBotOnGuild": true,
-            "averageMembers": {
-                "total": 94,
-                "online": 23
-            }
-        }
-    ]
-
-</script>
 
 </html>

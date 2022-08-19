@@ -765,7 +765,7 @@ function letAppearDiscord(query, discord_object) {
 
     function _tempAB(text) {
         if(!Search_settings.search.caseSensitive) {
-            return text.toLowerCase()
+            return _normalize(text).toLowerCase()
         } else { return text }
     }
     query = _tempAB(query)
@@ -872,7 +872,7 @@ setInterval(function() {
 function searchDiscord(discord_mode) {
     
     let query = document.getElementById(`${discord_mode}_query`).value
-    query = query
+    query = _normalize(query)
     //console.log(query)
     //displayedDiscordsCount_all_discords
     //
