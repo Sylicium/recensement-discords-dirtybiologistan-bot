@@ -103,6 +103,14 @@ function all(from_list, list_in, caseSensitive=true) {
 }
 
 
+module.exports.removeDuplicates = removeDuplicates
+/**
+ * removeDuplicates(): Supprime les doublons d'une liste
+ */
+function removeDuplicates(list) {
+    return list.filter((x, i) => i === list.indexOf(x))
+}
+
 
 
 module.exports.formatDate = formatDate

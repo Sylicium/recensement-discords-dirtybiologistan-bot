@@ -266,6 +266,10 @@ function _allCode() {
 
         console.log("interaction.command",interaction.command)
 
+       
+
+
+
         let cmd = bot.commands.slashCommands.get(interaction.commandName)
 
         if(!cmd) {
@@ -275,6 +279,45 @@ function _allCode() {
             })
         }
 
+        let hasPerm_bot1 = botf.checkPermissionsInChannel(
+            [ "VIEW_CHANNEL", "SEND_MESSAGES" ].concat(cmd.require.commandInformations.permisionsNeeded.bot),
+            interaction.guild.me_(),
+            interaction.channel,
+            true
+        )
+        
+        let hasPerm_bot2 = botf.checkPermissions(cmd.require.commandInformations.permisionsNeeded.bot, interaction.guild.me_(), true)
+        let hasPerm_bot = {
+            havePerm: hasPerm_bot1.havePerm && hasPerm_bot2.havePerm,
+            missingPermissions: somef.removeDuplicates(hasPerm_bot1.missingPermissions.concat(hasPerm_bot2.missingPermissions))
+        }
+
+        //Logger.debug(`BOT checking perms: ${cmd.require.commandInformations.permisionsNeeded.bot} : `,hasPerm_bot)
+        let hasPerm_user = botf.checkPermissions(cmd.require.commandInformations.permisionsNeeded.user, interaction.member)
+        //Logger.debug(`BOT checking perms: ${cmd.require.commandInformations.permisionsNeeded.user} : `,hasPerm_user)
+
+        if(!hasPerm_bot.havePerm) {
+            return interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor("FF0000")
+                        .setTitle(`🤖 Aie.. Le bot manque de permissions!`)
+                        .setDescription(`Il a besoin des permissions suivantes:\n${hasPerm_bot.missingPermissions.map((x) => {
+                            return `\`${x}\``
+                        }).join(", ")}`)
+                        .setFooter({ text: `Essayez de contacter un administrateur.` })
+                ],
+                ephemeral: false
+            })
+        }
+        if(!hasPerm_user.havePerm) {
+            return interaction.reply({
+                content: `⛔ Halte! Tu n'a pas la permission d'utiliser cette commande.\nIl te manque une de ces permissions: ${cmd.require.commandInformations.permisionsNeeded.user.map((x) => {
+                    return `\`${x}\``
+                }).join(", ")}`,
+                ephemeral: true
+            })
+        }
     
         /*
         let filtered = SlashCommandsCollection.filter(x => {
@@ -307,33 +350,6 @@ function _allCode() {
         if(!cmd || !cmd.require) {
             return interaction.reply({
                 content: `:x: Commande non prise en charge.`,
-                ephemeral: true
-            })
-        }
-        let hasPerm_bot = botf.checkPermissions(cmd.require.commandInformations.permisionsNeeded.bot, interaction.guild.me_(), true)
-        //Logger.debug(`BOT checking perms: ${cmd.require.commandInformations.permisionsNeeded.bot} : `,hasPerm_bot)
-        let hasPerm_user = botf.checkPermissions(cmd.require.commandInformations.permisionsNeeded.user, interaction.member)
-        //Logger.debug(`BOT checking perms: ${cmd.require.commandInformations.permisionsNeeded.user} : `,hasPerm_user)
-
-        if(!hasPerm_bot.havePerm) {
-            return interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setColor("FF0000")
-                        .setTitle(`🤖 Aie.. Le bot manque de permissions!`)
-                        .setDescription(`Il a besoin des permissions suivantes:\n${hasPerm_bot.missingPermissions.map((x) => {
-                            return `\`${x}\``
-                        }).join(", ")}`)
-                        .setFooter({ text: `Essayez de contacter un administrateur.` })
-                ],
-                ephemeral: false
-            })
-        }
-        if(!hasPerm_user.havePerm) {
-            return interaction.reply({
-                content: `⛔ Halte! Tu n'a pas la permission d'utiliser cette commande.\nIl te manque une de ces permissions: ${cmd.require.commandInformations.permisionsNeeded.user.map((x) => {
-                    return `\`${x}\``
-                }).join(", ")}`,
                 ephemeral: true
             })
         }

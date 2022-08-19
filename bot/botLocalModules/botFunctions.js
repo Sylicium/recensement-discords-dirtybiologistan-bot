@@ -24,6 +24,27 @@ function checkPermissions(permissionList, Member, haveAll=false) {
     return (haveAll ? json : { missingPermissions: [], havePerm: false})
 }
 
+module.exports.checkPermissionsInChannel = checkPermissionsInChannel
+function checkPermissionsInChannel(permissionList, Member, channel, haveAll=false) {
+    if(!Array.isArray(permissionList)) permissionList = [permissionList]
+    if(permissionList.length == 0) {
+        return { missingPermissions: [], havePerm: true }
+    }
+    let json = {
+        missingPermissions: [],
+        havePerm: true
+    }
+    for(let i in permissionList) {
+        let perm = permissionList[i]
+        if(channel.permissionsFor(Member).has(getBitFieldPermission(perm))) { if(!haveAll) return { missingPermissions: [], havePerm: true} }
+        else {
+            json.havePerm = false
+            json.missingPermissions.push(permissionList[i])
+        }
+    }
+    return (haveAll ? json : { missingPermissions: [], havePerm: false})
+}
+
 
 let BitFieldPermissions_ = {
     //"CREATE_INSTANT_INVITES": PermissionsBitField.Flags.SendMessages
