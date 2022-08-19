@@ -24,7 +24,7 @@ let commandInformations = {
     },
     canBeDisabled: false,
     permisionsNeeded: {
-        bot: ["SEND_MESSAGES"],
+        bot: ["SEND_MESSAGES","VIEW_CHANNEL"],
         user: ["ADMINISTRATOR", "MANAGE_GUILD"]
     },
     rolesNeeded: [],
