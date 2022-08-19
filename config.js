@@ -14,6 +14,26 @@ module.exports = {
     server: {
         port: 80
     },
+    api: {
+        me: {
+            api_token: process.env.API_TOKEN,
+            endpoints: {
+                dbsapiback: {
+                    url: "https://ReferencementDBG.gouv.repl.co/api/dbsapiback",
+                    method: "PUT"
+                }
+            }
+        },
+        dbs_api: {
+            api_token: process.env.DBS_API_TOKEN,
+            endpoints: {
+                createPage: {
+                    url: "https://dbs-api.captaincommand.repl.co/api/createSettingPage",
+                    method: "POST"
+                }
+            }
+        }
+    },
     superAdminList: [
         "774003919625519134", // compte principal
         "770334301609787392", // dc

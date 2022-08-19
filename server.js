@@ -1,8 +1,12 @@
+const express = require('express');
+const app = express();
 
-const app = require('express')();
-
+app.use(express.urlencoded())
+app.use(express.json())
 const serv = require('http').createServer(app);
-const io = require('socket.io')(serv);
+const io = require('socket.io')(serv)
+
+
 const Database = require("./localModules/database")
 const config = require("./config")
 let Logger = new (require("./localModules/logger"))()
@@ -24,6 +28,44 @@ app.get(`*`, (req, res) => {
     Logger.log("Request to url:",req.path)
     res.sendFile(`${__dirname}/site/${req.path}`)
 
+})
+
+app.put("/api/dbsapiback", (req,res) => {
+    try {
+        Logger.warn("[API]: (PUT) api/dbsapiback -> got request:",req)
+
+        if(req.body) {
+            for(let key in req.body) {
+                try {
+                    if(typeof req.body[key] != "string") continue;
+                    req.body[key] = JSON.parse(req.body[key])
+                } catch(e) {
+                    Logger.error(`[API]: Internal server error while parsing body key '${key}'.`,e)
+                    return res.send({
+                        status: 500,
+                        message: `Internal server error while parsing body key '${key}'.`,
+                        error: `${e}`,
+                        stack: e.stack.split("\n"),
+                        request: { uri: req.url, path: req.path, query: req.query, method: req.method }
+                    })
+                }
+            }
+        }
+
+
+
+
+        if(req.body.api_token != config.api.me.api_token) {
+            return res.send({
+                status: 401,
+                message: "Unauthorized."
+            })
+        }
+        
+    } catch(e) {
+        Logger.warn("[API]: Error on request (PUT) /api/dbsapiback",e)
+        Logger.warn(e.stack)
+    }
 })
 
 

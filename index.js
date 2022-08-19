@@ -59,6 +59,7 @@ const fs = require("fs");
 let config = require('./config')
 let somef = require('./localModules/someFunctions')
 let botf = require('./bot/botLocalModules/botFunctions')
+const axios = require("axios")
 
 let keepAliveDatas = JSON.parse(fs.readFileSync("./datas/keepalive.json", "utf-8"))
 
@@ -98,7 +99,8 @@ const Modules = {
     "Database": Database,
     "Discord": Discord,
     "discordInv": discordInv,
-    "server": server
+    "server": server,
+    "axios": axios
 }
 
 
