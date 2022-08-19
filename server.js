@@ -56,7 +56,7 @@ io.on('connection', (socket) => {
 let Cache_all_discords = []
 
 
-module.exports.getCachedDiscords = this.getCachedDiscords
+module.exports.getCachedDiscords = getCachedDiscords
 function getCachedDiscords() { return JSON.parse(JSON.stringify(Cache_all_discords)) }
 
 module.exports.refreshDiscords_cache = refreshDiscords_cache

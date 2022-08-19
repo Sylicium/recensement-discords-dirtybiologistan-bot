@@ -1,5 +1,4 @@
 
-const discordInv = require('discord-inv');
 
 let inDev = true
 
@@ -50,7 +49,8 @@ process
         writeUncaughException(err, "Uncaught Exception (process.on handle)")
     });
 
-let Discord = require("discord.js")
+const Discord = require("discord.js")
+const discordInv = require('discord-inv');
 let _normalize = require('normalize-strings');
 let Intents = Discord.Intents
 let EmbedBuilder = Discord.EmbedBuilder
@@ -65,6 +65,7 @@ let keepAliveDatas = JSON.parse(fs.readFileSync("./datas/keepalive.json", "utf-8
 function saveAlive() {
     fs.writeFileSync("./datas/keepalive.json", JSON.stringify(keepAliveDatas))
 }
+
 
 /*
 https://discord.com/api/oauth2/authorize?client_id=968799075686289409&permissions=2147601409&scope=bot%20applications.commands
@@ -84,6 +85,21 @@ Logger.info("=======================================")
 Logger.info("========== [Starting script] ==========")
 Logger.info("=======================================")
 
+
+const server = require("./server")
+const { hyperlink } = require("discord.js")
+
+
+const Modules = {
+    "config": config,
+    "somef": somef,
+    "botf": botf,
+    "_normalize": _normalize,
+    "Database": Database,
+    "Discord": Discord,
+    "discordInv": discordInv,
+    "server": server
+}
 
 
 let bot = new Discord.Client({
@@ -230,7 +246,7 @@ function _allCode() {
 
         interaction.guild.me_ = () => { return interaction.guild.members.cache.get(bot.user.id) }
 
-        Logger.debug("interaction",interaction)
+        Logger.debug("interaction [command]",interaction)
     
         let data = await Database.getGuildDatas(interaction.guild.id)
     
@@ -253,17 +269,38 @@ function _allCode() {
         */
     
         let cmd = bot.commands.slashCommands.get(interaction.command.name)
+        
     
-        if(!cmd) {
+        if(cmd.require.commandInformations.superAdminOnly && !somef.isSuperAdmin(interaction.user.id)) {
+            return interaction.reply({
+                content: `⛔ Commande SUPER_ADMIN uniquement.`,
+                ephemeral: true
+            }) 
+        }
+        if(cmd.require.commandInformations.disabled && !somef.isSuperAdmin(interaction.user.id)) {
+            return interaction.reply({
+                content: `⛔ Commande désactivée.`,
+                ephemeral: true
+            }) 
+        }
+        if(cmd.require.commandInformations.indev && !somef.isSuperAdmin(interaction.user.id)) {
+            return interaction.reply({
+                content: `🛠 Commande en développement`,
+                ephemeral: true
+            }) 
+        }
+
+
+        if(!cmd || !cmd.require) {
             return interaction.reply({
                 content: `:x: Commande non prise en charge.`,
                 ephemeral: true
             })
         }
         let hasPerm_bot = botf.checkPermissions(cmd.require.commandInformations.permisionsNeeded.bot, interaction.guild.me_(), true)
-        console.log(`BOT checking perms: ${cmd.require.commandInformations.permisionsNeeded.bot} : `,hasPerm_bot)
+        //Logger.debug(`BOT checking perms: ${cmd.require.commandInformations.permisionsNeeded.bot} : `,hasPerm_bot)
         let hasPerm_user = botf.checkPermissions(cmd.require.commandInformations.permisionsNeeded.user, interaction.member)
-        console.log(`BOT checking perms: ${cmd.require.commandInformations.permisionsNeeded.user} : `,hasPerm_user)
+        //Logger.debug(`BOT checking perms: ${cmd.require.commandInformations.permisionsNeeded.user} : `,hasPerm_user)
 
         if(!hasPerm_bot.havePerm) {
             return interaction.reply({
@@ -288,12 +325,45 @@ function _allCode() {
             })
         }
 
-
-        cmd.require.execute(bot, interaction, data)
+        
+        cmd.require.execute(Modules, bot, interaction, data).catch(async err => {
+            Logger.warn(`Command crashed`,err)
+            let the_error_msg = {
+                content: "",
+                embeds: [
+                    new Discord.EmbedBuilder()
+                        .setTitle(`:x: Woops, looks like the command crashed.`)
+                        .setColor("FF0000")
+                        .setDescription(`\`\`\`js\n${err.stack}\`\`\``)
+                ]
+            }
+            try {
+                await interaction.reply(the_error_msg)
+            } catch(e) {
+                await interaction.editReply(the_error_msg)
+            }
+        })
 
     })
 
 
+    bot.on('interactionCreate', async interaction => {
+
+        if (!interaction.isButton()) return;
+        
+        if(!interaction.guild) return;
+        if(interaction.user.bot) return;
+
+        interaction.guild.me_ = () => { return interaction.guild.members.cache.get(bot.user.id) }
+
+        Logger.debug("Got interaction button: "+interaction)
+
+        let data = await Database.getGuildDatas(interaction.guild.id)
+
+
+
+        //console.log(interaction);
+    });
 
 
 
@@ -308,7 +378,8 @@ function _allCode() {
 
 
 
-    let server = require("./server")
+
+
     server.run(bot)
 
     async function checkAnRecreateInvites() {
@@ -334,7 +405,7 @@ function _allCode() {
             let d = discordsList[i]
 
 
-            console.log("inviteURL", d.inviteURL)
+            Logger.debug("inviteURL", d.inviteURL)
             await somef.sleep(5)
 
 
@@ -438,7 +509,27 @@ function _allCode() {
 
         //if(message.author.id != "770334301609787392") return;
 
+
         if (!message.content.startsWith(config.bot.prefix)) return;
+        
+        /********************/
+        let temp_lines = [
+            `Si oui alors sache que toutes les commandes viennent de passer en commande slash !`,
+            `Tape / pour afficher la liste des commandes.`,
+            ``,
+            `Si tu ne vois pas le bot dans les commandes slash demande à un administrateur de réinviter le bot par [ce lien](${config.bot.inviteURL} "Inviter le bot avec l'autorisation de créer des slash commandes").`,
+            `Un problème avec le bot ? Ping Sylicium sur le [serveur d'assistance](https://discord.gg/AtSyeNVEab "Assitance")`
+        ].join("\n")
+        return message.reply({
+            embeds: [
+                new Discord.EmbedBuilder()
+                    .setTitle(`Hey, essais-tu d'éxécuter une commande ?`)
+                    .setColor("FF9800")
+                    .setDescription(temp_lines)
+                    .setFooter({ text: "Bot de référencement officiel des Discords DirtyBiologistanais." })
+            ]
+        })
+        /********************/
 
         let args = message.content.slice(config.bot.prefix.length).split(' ');
         let command = args.shift().toLowerCase();
@@ -464,7 +555,7 @@ function _allCode() {
                 { name: "certify", description: "⛔ [développeur] Permet de certifier une guilde" },
                 { name: "forcerefresh", description: "⛔ [développeur] Permet de forcer la rafaîchissement des discords sur le site" }
             ]
-            let command_string_list = []
+            let command_string_list = []        
             for (let i in commands) {
                 command_string_list.push(`\`${commands[i].name}\` : *${commands[i].description}*`)
             }
@@ -505,7 +596,7 @@ function _allCode() {
                     .setFooter({ text: "Référencement officiel des Discords DirtyBiologistanais."})
                     .setTimestamp()
             )
-            return
+            return;
         } else if (command == "info") {
             return message.reply(`:x: Cette commande n'est pas encore disponible.`)
             return;
@@ -544,14 +635,14 @@ function _allCode() {
                 msg1.awaitReactions((reaction, user) => user.id == message.author.id && (reaction.emoji.name == '✅' || reaction.emoji.name == '❌'), { max: 1, time: 60 * 1000 })
                     .then(async collected => {
                         if (collected.first().emoji.name == '✅') {
-                            msg1.reactions.removeAll().catch(e => { console.log("Missing Permission to clear reactions") })
+                            msg1.reactions.removeAll().catch(e => { Logger.debug("Missing Permission to clear reactions") })
 
                             Database.deleteReferencedGuild(message.guild.id)
 
                             msg1.edit(`Le Discord n'est désormais plus référencé.`)
                             return;
                         } else {
-                            msg1.reactions.removeAll().catch(e => { console.log("Missing Permission to clear reactions") })
+                            msg1.reactions.removeAll().catch(e => { Logger.debug("Missing Permission to clear reactions") })
                             msg1.edit(`${initial_msg}\n\n:x: Vous avez annulé la commande.`)
                             return;
                         }
@@ -614,7 +705,7 @@ function _allCode() {
                 msg1.awaitReactions((reaction, user) => user.id == message.author.id && (reaction.emoji.name == '✅' || reaction.emoji.name == '❌'), { max: 1, time: 60 * 1000 })
                     .then(async collected => {
                         if (collected.first().emoji.name == '✅') {
-                            msg1.reactions.removeAll().catch(e => { console.log("Missing Permission to clear reactions") })
+                            msg1.reactions.removeAll().catch(e => { Logger.debug("Missing Permission to clear reactions") })
 
 
                             msg1.edit(`${config.emojis.loading.tag} Référencement en cours... cela peut prendre un moment.`).then(async msg2 => {
@@ -630,7 +721,7 @@ function _allCode() {
                                 } catch(e) {
                                     back_msg_actions.push(`   Impossible de créer l'invitation: ${e}`)
                                 }
-                                console.log("the_invite created:", the_invite)
+                                Logger.log("the_invite created:", the_invite)
 
                                 if (the_invite) {
                                     back_msg_actions.push(`   Invitation créé avec le code ${the_invite.code}`)
@@ -649,7 +740,7 @@ function _allCode() {
                                     invite = await discordInv.getInv(discordInv.getCodeFromUrl(the_invite.url))
                                     back_msg_actions.push(`   Récupération effectuée. ${invite.approximate_presence_count} membres connectés sur ${invite.approximate_member_count}.`)
                                 } catch (e) {
-                                    console.log("error:", e)
+                                    Logger.debug("error:", e)
                                     if (`${e}` == "429") {
                                         back_msg_actions.push(`   Une erreur est survenue: code ${e} | RateLimited`)
                                         back_msg_actions.push(`   Le bot tentera de réactualiser le nombre de membres plus tard.`)
@@ -663,7 +754,7 @@ function _allCode() {
                                 }
 
                                 if (invite) {
-                                    console.log("adding")
+                                    Logger.debug("adding")
                                     total_members = invite.approximate_member_count
                                     online_members = invite.approximate_presence_count
                                 }
@@ -731,7 +822,7 @@ function _allCode() {
 
 
                             }).catch(err => {
-                                console.log(err)
+                                Logger.error(err)
 
                                 msg1.edit(`${config.emojis.no.tag} Une erreur est survenue durant le référencement du Discord. Si l'erreur persiste contactez le développeur du bot.`)
                                 msg1.reply("a",
@@ -750,7 +841,7 @@ function _allCode() {
 
 
                         } else {
-                            msg1.reactions.removeAll().catch(e => { console.log("Missing Permission to clear reactions") })
+                            msg1.reactions.removeAll().catch(e => { Logger.debug("Missing Permission to clear reactions") })
                             msg1.edit(`${initial_msg}\n\n:x: Vous avez annulé la commande.`)
                             return;
                         }
@@ -1014,12 +1105,6 @@ function _allCode() {
     });
 
 
-
-    bot.on('interactionCreate', (interaction) => {
-        Logger.log("new interaction")
-        console.log(interaction)
-
-    })
 
 
 } // AllCode

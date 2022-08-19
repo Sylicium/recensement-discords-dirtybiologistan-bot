@@ -9,15 +9,15 @@ let somef = require("../../localModules/someFunctions")
 module.exports = {
     commandInformations: {
         commandDatas: {
-            name: "checkperms",
-            description: "Renvoie la liste des permission qu'a et devrait avoir le bot.",
+            name: "list",
+            description: "Consulter la liste des serveurs référencés.",
             dmPermission: false,
             type: Discord.ApplicationCommandType.ChatInput,
             options: []
         },
         canBeDisabled: false,
         permisionsNeeded: {
-            bot: ["SEND_MESSAGES"],
+            bot: ["SEND_MESSAGES","VIEW_CHANNEL"],
             user: []
         },
         rolesNeeded: [],
@@ -28,21 +28,21 @@ module.exports = {
     },
     execute: async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h) => {
 
-		await interaction.deferReply({
-            ephemeral: true
-        });
+        await interaction.deferReply()
 
-        let checkedPerms = botf.checkPermissionList(interaction.guild.me_())
+        console.log("Modules",Modules)
+
+        let serverCount = Modules.server.getCachedDiscords().length
         await interaction.editReply({
-            content: `Le bot necessite la permission | le bot a la permission\n${checkedPerms.list.join("\n")}`,
-            ephemeral: true
+            embeds: [
+                new Discord.EmbedBuilder()
+                    .setColor("#4444FF")
+                    .setDescription(`${serverCount} serveurs référencé, [consulter la liste des serveurs de la micronation 🌎](${config.website.url})`)
+                    .setFooter({ text: "Référencement officiel des Discords DirtyBiologistanais."})
+                    .setTimestamp()
+            ]
         })
-        if(checkedPerms.permissions_missing.length > 0) {
-            await interaction.followUp({
-                content: `_${interaction.member.nickname || interaction.user.tag} a utilisé /checkperms_\nListe des permissions manquantes au bot: \`${checkedPerms.permissions_missing.join("\`, \`")}\` `
-            })
-        }
-        return;
+        return
 
 
     }

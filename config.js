@@ -6,8 +6,10 @@ module.exports = {
         setApplicationCommandsOnStart: true,
         setApplicationCommandsInLocal: true,
         setApplicationCommandsInLocal_guilds: [
-            "909168225936363601"
-        ]
+            "909168225936363601",
+            "981609125622452224"
+        ],
+        inviteURL: "https://discord.com/oauth2/authorize?client_id=968799075686289409&permissions=294205643841&scope=bot%20applications.commands"
     },
     server: {
         port: 80
@@ -32,6 +34,26 @@ module.exports = {
         "no": {
             id: "",
             tag: "❌"
+        },
+        "bluebutton": {
+            id:"",
+            tag: "<:bluebutton:1009964954608214197>"
+        },
+        "whitebutton": {
+            id:"",
+            tag: "<:whitebutton:1009964968571043880>"
+        },
+        "whitebarleft": {
+            id: "",
+            tag: "<:whitebarleft:1009965122409730109>"
+        },
+        "whitebar": {
+            id: "",
+            tag: "<:whitebar:1009965136179642498>"
+        },
+        "whitebarright": {
+            id: "",
+            tag: "<:whitebarright:1009965128772493394>"
         }
     }
 }

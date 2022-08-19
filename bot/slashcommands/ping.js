@@ -26,7 +26,7 @@ module.exports = {
         indev: false,
         hideOnHelp: false
     },
-    execute: async (bot, interaction, data, a,b,c,d,e,f,g,h) => {
+    execute: async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h) => {
 
 		await interaction.deferReply();
         
