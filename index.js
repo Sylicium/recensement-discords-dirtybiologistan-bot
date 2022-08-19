@@ -173,6 +173,32 @@ function _allCode() {
 
 
     bot.commands = {}
+    bot.commands.slashCommands = new Discord.Collection();
+
+    let SlashCommandsCollection = []
+    
+    fs.readdirSync("./bot/slashcommands").forEach(file => {
+        if(file.endsWith(".js")) {
+            try {
+                let fileName = file.split(".")
+                fileName.pop()
+                fileName.join(".")
+
+                temp = require(`./bot/slashcommands/${fileName}`)
+                SlashCommandsCollection.push({
+                    commandInformations: temp.commandInformations,
+                    require: temp
+                });
+                bot.commands.slashCommands.set(temp.commandInformations.commandDatas.name, {
+                    commandInformations: temp.commandInformations,
+                    require: temp
+                });
+                Logger.info(`✔ Successfully loaded command ${temp.commandInformations.commandDatas.name}`)
+            } catch(e) {
+                Logger.warn(`❌ Failed loading command of file /slashcommands/${file}`,e)
+            }
+        }
+    });
  
     bot.on("ready", () => {
         Logger.info(`[BOT]: Bot démarré en tant que ${bot.user.tag}`)
@@ -181,34 +207,8 @@ function _allCode() {
         checkAnRecreateInvites()
         setInterval(checkAnRecreateInvites, 1000 * 3600 * 1)
         
-            
-        bot.commands.slashCommands = new Discord.Collection();
-
-        let SlashCommandsCollection = []
         
         try {
-            fs.readdirSync("./bot/slashcommands").forEach(file => {
-                if(file.endsWith(".js")) {
-                    try {
-                        let fileName = file.split(".")
-                        fileName.pop()
-                        fileName.join(".")
-        
-                        temp = require(`./bot/slashcommands/${fileName}`)
-                        SlashCommandsCollection.push({
-                            commandInformations: temp.commandInformations,
-                            require: temp
-                        });
-                        bot.commands.slashCommands.set(temp.commandInformations.commandDatas.name, {
-                            commandInformations: temp.commandInformations,
-                            require: temp
-                        });
-                        Logger.info(`✔ Successfully loaded command ${temp.commandInformations.commandDatas.name}`)
-                    } catch(e) {
-                        Logger.warn(`❌ Failed loading command of file /slashcommands/${file}`,e)
-                    }
-                }
-            });
 
             if(config.bot.setApplicationCommandsOnStart) {
                 Logger.warn("❕ Penser à désactiver le config.bot.setApplicationCommandsOnStart pour ne pas recharger les commandes à chaque démarrage.")
