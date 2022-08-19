@@ -259,8 +259,12 @@ function _allCode() {
         Logger.debug("Got interaction: "+interaction)
     
         if(!interaction.isCommand()) return;
-    
-        if(!interaction.command) {
+
+        console.log("interaction.command",interaction.command)
+
+        let cmd = bot.commands.slashCommands.get(interaction.commandName)
+
+        if(!cmd) {
             return interaction.reply({
                 content: ":x: Commande inconnue. [code#01]",
                 ephemeral: true
@@ -274,7 +278,6 @@ function _allCode() {
         })
         */
     
-        let cmd = bot.commands.slashCommands.get(interaction.command.name)
         
     
         if(cmd.require.commandInformations.superAdminOnly && !somef.isSuperAdmin(interaction.user.id)) {
