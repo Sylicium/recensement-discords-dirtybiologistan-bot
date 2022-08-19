@@ -525,7 +525,7 @@ function _allCode() {
         if(Math.random() < 0.1) { Database.updateDiscordDatas(message.guild) }
 
         if (message.mentions.has(bot.user) && !message.mentions.everyone) {
-            return message.reply(`✨ Hey! I use slash commands. Type \`${config.bot.prefix}help\` or \`/help\` to see the help panel. `).then(msg => { setTimeout(() => { msg.delete() }, 5 * 60 * 1000) })
+            return message.reply(`✨ Hey! I use slash commands. Type \`${config.bot.prefix}help\` or \`/help\` to see the help panel. `).then(msg => { setTimeout(() => { msg.delete() }, 10 * 1000) })
         }
 
         //if(message.author.id != "770334301609787392") return;
