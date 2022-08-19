@@ -175,6 +175,12 @@ function _allCode() {
     bot.commands = {}
  
     bot.on("ready", () => {
+        Logger.info(`[BOT]: Bot démarré en tant que ${bot.user.tag}`)
+        //console.log(`Bot démarré en tant que ${bot.user.tag} | ${Object.size(bot.guilds.cache)} serveurs rejoints`)
+
+        checkAnRecreateInvites()
+        setInterval(checkAnRecreateInvites, 1000 * 3600 * 1)
+        
             
         bot.commands.slashCommands = new Discord.Collection();
 
@@ -468,16 +474,6 @@ function _allCode() {
 
     }
 
-    bot.on("ready", () => {
-        Logger.info(`Bot démarré en tant que ${bot.user.tag}`)
-        //console.log(`Bot démarré en tant que ${bot.user.tag} | ${Object.size(bot.guilds.cache)} serveurs rejoints`)
-
-        checkAnRecreateInvites()
-
-        setInterval(checkAnRecreateInvites, 1000 * 3600 * 1)
-
-    })
-
 
     bot.on("messageCreate", async (message) => {
         //if (inDev) return Logger.log("Message got, but in local dev")
@@ -504,7 +500,7 @@ function _allCode() {
         if(Math.random() < 0.1) { Database.updateDiscordDatas(message.guild) }
 
         if (message.mentions.has(bot.user) && !message.mentions.everyone) {
-            return message.reply(`✨ Hey! My prefix is \`${config.bot.prefix}\`. Type \`${config.bot.prefix}help\` to see the help panel. `).then(msg => { setTimeout(() => { msg.delete() }, 5 * 60 * 1000) })
+            return message.reply(`✨ Hey! I use slash commands. Type \`${config.bot.prefix}help\` or \`/help\` to see the help panel. `).then(msg => { setTimeout(() => { msg.delete() }, 5 * 60 * 1000) })
         }
 
         //if(message.author.id != "770334301609787392") return;
