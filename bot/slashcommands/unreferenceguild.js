@@ -31,12 +31,6 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
 
         await interaction.deferReply()
 
-        let traitement_en_cours = `${config.emojis.loading.tag} Traitement de la demande en cours...`
-        let msg = await interaction.editReply(traitement_en_cours)
-        setTimeout(() => {
-            if (msg.content == traitement_en_cours) interaction.editReply(`${config.emojis.no.tag} La requête a pris trop de temps. Réessayez ultérieurement.`)
-        }, 60 * 1000)
-
         let isReferenced = await Modules.Database.isReferencedGuild(interaction.guild.id)
         if (!isReferenced) {
             await interaction.editReply(`:x: Ce serveur n'est déjà pas référencé.`)
@@ -77,7 +71,7 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
             
             let hasPerm_user = botf.checkPermissions(this.commandInformations.permisionsNeeded.user, i.member)
     
-            if (!hasPerm_user.havePerm && !isSuperAdmin(i.user.id)) {
+            if (!hasPerm_user.havePerm && !Modules.somef.isSuperAdmin(i.user.id)) {
                 return i.reply(`Vous n'avez pas la permission d'utiliser cette commande. \`ADMINISTRATOR\` or \`MANAGE_GUILD\` `)
             }
     

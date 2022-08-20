@@ -48,6 +48,7 @@ module.exports = {
             `${guildInfos ? ico.on : ico.off} Référencé`,
             `${(guildInfos && guildInfos.settings.certified) ? ico.on : ico.off} Certifié`,
             `${(guildInfos && guildInfos.settings.private) ? ico.on : ico.off} Mode privé`,
+            `${ico.on} Relèvement des statistiques (à venir)`,
             `${(guildInfos && guildInfos.settings.isBotOnGuild) ? ico.on : ico.off} Le bot est toujours présent sur le serveur`,
             `Description: \`\`\`${guildInfos ? guildInfos.guild.description : "Serveur non référencé"}\`\`\` `,
             `Mots clé: \`\`\`${(guildInfos && guildInfos.keywords) ? guildInfos.keywords.join(", ") : "Aucun mot clé"}\`\`\` `,

@@ -64,7 +64,7 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
             "submenu": [
                 {
                     "name": "Référencer ou non le serveur",
-                    "description": "Pour retirer le serveur du référencement vous devez impérativement utiliser les commandes /referenceguild et /unreferenceguild.",
+                    "description": "Pour mettre ou retirer le serveur du référencement vous devez impérativement utiliser les commandes /referenceguild et /unreferenceguild.",
                     "id": "reference_or_not",
                     "settingType": {
                         "type": 0
@@ -73,7 +73,7 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
                 },
                 {
                     "name": "Certification",
-                    "description": `Votre serveur est actuellement ${guildInfos.settings.certified ? "certifié comme un Discord de la micro-nation 💚" : "non certifié comme un Discord de la micro-nation."}`,
+                    "description": `Votre serveur est actuellement ${guildInfos?.settings.certified ? "certifié comme un Discord de la micro-nation 💚" : "non certifié comme un Discord de la micro-nation."}`,
                     "id": "certified",
                     "settingType": {
                         "type": 0

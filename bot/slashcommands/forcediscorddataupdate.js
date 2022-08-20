@@ -11,10 +11,17 @@ module.exports = {
     commandInformations: {
         commandDatas: {
             name: "forcediscorddataupdate",
-            description: "⛔ Forcer le raffraîchissement des données de tous les discords.",
+            description: "⛔ Forcer le raffraîchissement des données de guildes référencées.",
             dmPermission: false,
             type: Discord.ApplicationCommandType.ChatInput,
-            options: []
+            options: [
+                {
+                    "name": "guild_id",
+                    "description": "Une guilde précide à refresh",
+                    "type": 3,
+                    "required": false
+                }
+            ]
         },
         canBeDisabled: false,
         permisionsNeeded: {
@@ -31,14 +38,24 @@ module.exports = {
         
         await interaction.deferReply({ ephemeral: true })
 
-        interaction.editReply(`${config.emojis.loading.tag} Rafraîchissement des informations de tous les serveurs discord...`).then(async msg => {
-            await Database.updateDiscordDatas_allGuilds()
-            interaction.editReply(`${config.emojis.check_mark.tag} Opération terminée, les données de ${discordCached.length} discords ont été rafraîchies.`)
-        }).catch(e => {
-            console.log(e)
-            interaction.editReply(`:x: Une erreur est survenue durant le rafraîchissement des informations: \`\`\`js\n${e}\`\`\` `)
-        })
-        return;
+        if(!interaction.options.get("guild_id")) {
+
+            interaction.editReply(`${config.emojis.loading.tag} Rafraîchissement des informations de **tous les serveurs discord**...`).then(async msg => {
+                await Modules.Database.updateDiscordDatas_allGuilds()
+                interaction.editReply(`${config.emojis.check_mark.tag} Opération terminée, les données de ${discordCached.length} discords ont été rafraîchies.`)
+            }).catch(e => {
+                console.log(e)
+                interaction.editReply(`:x: Une erreur est survenue durant le rafraîchissement des informations: \`\`\`js\n${e}\`\`\` `)
+            })
+        } else {
+            let guild = bot.guilds.cache.get(interaction.options.get("guild_id").value)
+            if(!guild) return interaction.editReply({ content: "ID de guilde invalide / Le bot n'est plus sur cette guilde" })
+
+            interaction.editReply(`${config.emojis.loading.tag} Rafraîchissement des informations du serveur **${guild.name}** (\`${guild.id}\`)`)
+            await Modules.Database.updateDiscordDatas(guild)
+            interaction.editReply(`${config.emojis.check_mark.tag} Opération terminée, les données du serveur **${guild.name}** (\`${guild.id}\`) ont été rafraîchies.`)
+        }
+
 
 
     }
