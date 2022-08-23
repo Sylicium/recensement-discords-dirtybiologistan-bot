@@ -103,7 +103,7 @@ io.on('connection', (socket) => {
 
         socket.emit("Back_getAllDiscords", {
             state: true,
-            all_discords: Cache_all_discords
+            all_discords: getCachedDiscords()
         })
         
     })

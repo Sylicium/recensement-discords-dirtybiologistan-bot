@@ -17,7 +17,7 @@ module.exports = {
                 {
                     "name": "all",
                     "description": "Afficher toutes les commandes, même que je ne peux pas utiliser",
-                    "type": 5,
+                    "type": Discord.ApplicationCommandOptionType.Boolean,
                     "required": false
                 }
             ]

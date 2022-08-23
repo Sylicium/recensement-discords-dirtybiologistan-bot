@@ -18,7 +18,7 @@ module.exports = {
                 {
                     "name": "guild_id",
                     "description": "Une guilde précide à refresh",
-                    "type": 3,
+                    "type": Discord.ApplicationCommandOptionType.String,
                     "required": false
                 }
             ]

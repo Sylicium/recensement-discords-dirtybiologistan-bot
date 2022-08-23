@@ -18,13 +18,13 @@ module.exports = {
                 {
                     "name": "guild_id",
                     "description": "L'ID de la guilde a traiter",
-                    "type": 3,
+                    "type": Discord.ApplicationCommandOptionType.String,
                     "required": true
                 },
                 {
                     "name": "certify",
                     "description": "Activer/Désactiver la certification",
-                    "type": 5,
+                    "type": Discord.ApplicationCommandOptionType.Boolean,
                     "required": true
                 }
             ]

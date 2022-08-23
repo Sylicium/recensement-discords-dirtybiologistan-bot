@@ -13,7 +13,14 @@ module.exports = {
             description: "Rechercher des discords",
             dmPermission: false,
             type: Discord.ApplicationCommandType.ChatInput,
-            options: []
+            options: [
+                {
+                    "name": "query",
+                    "description": "Recherche à effectuer",
+                    "type": Discord.ApplicationCommandOptionType.String,
+                    "required": true
+                }
+            ]
         },
         canBeDisabled: false,
         permisionsNeeded: {
@@ -28,16 +35,41 @@ module.exports = {
     },
     execute: async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h) => {
 
-        interaction.deferReply({ ephemeral: true })
+        await interaction.deferReply({ ephemeral: true })
 
-        let serverCount = server.getCachedDiscords().length
-        interaction.reply("a",
-            new EmbedBuilder()
-                .setColor("#4444FF")
-                .setDescription(`${serverCount} serveurs référencé, [consulter la liste des serveurs de la micronation 🌎](${config.website.url})`)
-                .setFooter({ text: "Référencement officiel des Discords DirtyBiologistanais."})
-                .setTimestamp()
-        )
+        let query = interaction.options.get("query").value
+
+
+        let all_discords = Modules.server.getCachedDiscords()
+
+        let lines = [
+            `${serverCount} serveurs référencé `,
+            `Survolez les (?) pour afficher des infos`,
+            ``,
+            `_💡 Recherche plus affinées et personnalisables sur [le site](${config.website.url})_`,
+        ].join("\n")
+
+        let thisChanUrl = `https://discord.com/channels/${interaction.guild.id}/${interaction.channel.id}`
+
+        function getGuild_textBloc(guildObject) {
+            let lines = [
+                `> ${guildObject.inviteURL ? `**[${guildObject.guild.name}](${guildObject.inviteURL} "${guildObject.inviteURL}")**` : `${guildObject.guild.name}[(?)](${thisChanUrl} "Invitation invalide")`}`
+            ]
+
+
+            return lines
+        }
+
+        let serverCount = all_discords.length
+        await interaction.reply({
+            embeds: [
+                new Discord.EmbedBuilder()
+                    .setColor("#4444FF")
+                    .setDescription(`${lines}`)
+                    .setFooter({ text: "Référencement officiel des Discords DirtyBiologistanais."})
+                    .setTimestamp()
+            ]
+        })
         return;
 
 
