@@ -88,8 +88,6 @@ Logger.info("=======================================")
 
 
 const server = require("./server")
-const { hyperlink } = require("discord.js")
-
 
 const Modules = {
     "config": config,

@@ -1,6 +1,6 @@
 module.exports = {
     bot: {
-        prefix: "-",
+        prefix: "r!",
         id: "",
         token: process.env["TOKEN"],
         setApplicationCommandsOnStart: false,
