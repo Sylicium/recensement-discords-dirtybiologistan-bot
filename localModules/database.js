@@ -47,7 +47,7 @@ class Database {
         return this.Mongo.db(this._usedDataBaseName).collection("accounts").find(search_params).toArray()
     }
     async getAllDiscords() {
-        return await this.Mongo.db(this._usedDataBaseName).collection("discordsList").find() // ne pas mettre .toArray() car mis en dehors
+        return this.Mongo.db(this._usedDataBaseName).collection("discordsList").find() // ne pas mettre .toArray() car mis en dehors
     }
     
     async getGuildDatas(guild_id) {

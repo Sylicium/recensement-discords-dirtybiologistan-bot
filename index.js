@@ -430,12 +430,15 @@ function _allCode() {
             }
         }))
 
+        let maxCount = discordsList.length
         for (let i in discordsList) {
             let d = discordsList[i]
 
+            let count = `(${parseInt(i)+1}/${maxCount})`
+
 
             Logger.debug("inviteURL", d.inviteURL)
-            await somef.sleep(5)
+            await somef.sleep(300)
 
 
             async function after_got_the_invite(invite, httpcode) {
@@ -444,7 +447,7 @@ function _allCode() {
                     if (invite.expires_at == null) validInvite = true
                 }
 
-                Logger.info(`${d.guild.id} -> : ${validInvite ? "Valid invitation." : `Invalid:${httpcode}`} (${d.guild.name})`)
+                Logger.info(`${count} ${d.guild.id} -> : ${validInvite ? "Valid invitation." : `Invalid:${httpcode}`} (${d.guild.name})`)
 
                 let the_guild = bot.guilds.cache.get(d.guild.id)
 
@@ -458,21 +461,21 @@ function _allCode() {
                     Database.updatePresenceCount(d._id, invite) // invite.approximate_presence_count
                 } else {
                     if (!validInvite && httpcode == "429") {
-                        Logger.info(`${d.guild.id} -> :   429 Rate Limited. No action. is a guild: ${!!the_guild} | validInvite: ${validInvite}`)
+                        Logger.info(`${count} ${d.guild.id} -> :   429 Rate Limited. No action. is a guild: ${!!the_guild} | validInvite: ${validInvite}`)
                         return;
                     } else if (the_guild && !validInvite) {
                         Database.updateInviteCode(the_guild)
                         Database.set_isBotInGuild(d.guild.id, true)
-                        Logger.info(`${d.guild.id} -> :   Updated invite.`)
+                        Logger.info(`${count} ${d.guild.id} -> :   Updated invite.`)
                     } else if (!the_guild && !validInvite) {
                         Database.set_isBotInGuild(d.guild.id, false)
                         Database.setInviteURL(d._id, "")
-                        Logger.info(`${d.guild.id} -> :   Cannot update invite, bot is no longer on guild.`)
+                        Logger.info(`${count} ${d.guild.id} -> :   Cannot update invite, bot is no longer on guild.`)
                     } else if (!the_guild && validInvite) {
-                        Logger.info(`${d.guild.id} -> :   Bot is not on guild but invite is valid.`)
+                        Logger.info(`${count} ${d.guild.id} -> :   Bot is not on guild but invite is valid.`)
                         Database.updatePresenceCount(d._id, invite)
                     } else {
-                        Logger.info(`${d.guild.id} -> :   Wtf i dont know. is a guild: ${!!the_guild} | validInvite: ${validInvite}`)
+                        Logger.info(`${count} ${d.guild.id} -> :   Wtf i dont know. is a guild: ${!!the_guild} | validInvite: ${validInvite}`)
                     }
                 }
 
