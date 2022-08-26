@@ -29,7 +29,7 @@ module.exports = {
     },
     execute: async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h) => {
 
-        await interaction.deferReply()
+        await interaction.deferReply({ ephemeral: true })
 
         let allGuilds = await (await Modules.Database.getAllDiscords()).toArray()
 
@@ -126,10 +126,10 @@ module.exports = {
                     let one_channel = getOneChannelInGuild(item.guild)
                     let invite = await one_channel.createInvite(
                         {
-                            maxAge: 604700, // maximum time for the invite, in milliseconds
+                            maxAge: 60*15, // maximum time for the invite, in milliseconds
                             maxUses: 100 // maximum times it can be used
                         },
-                        `Invitation automatique créé par ORU bot.`
+                        `Invitation automatique créé par le bot ${bot.user.tag}.`
                     )
 
                     return `[${getB(item.referenced)} ${getB(item.certified)} ${getB(item.private)} ${getB(item.guild)} ${item.guild.name}](https://discord.gg/${invite.code} "Rejoindre le serveur")`
@@ -240,12 +240,14 @@ module.exports = {
         for(let i in embeds) {
             if(i == 0) {
                 await interaction.editReply({
-                    embeds: [ embeds[i] ]
+                    embeds: [ embeds[i] ],
+                    ephemeral: true
                 })
             } else {
 
                 await interaction.followUp({
-                    embeds: [ embeds[i] ]
+                    embeds: [ embeds[i] ],
+                    ephemeral: true
                 })
             }
         }
@@ -272,7 +274,8 @@ module.exports = {
             content: "List at txt format:",
             files: [
                 new Discord.AttachmentBuilder(Buffer.from(all_txtfile_text, 'utf-8'), { name: `ReferencedGuilds_Dibistan_${the_date_filename}.txt`})
-            ]
+            ],
+            ephemeral: true
         })
         
         
