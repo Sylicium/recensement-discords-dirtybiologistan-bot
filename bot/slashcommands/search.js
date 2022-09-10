@@ -114,10 +114,9 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
     
                     _💡 Recherche plus affinées et personnalisables sur [le site](${config.website.url})_
                     `)
-                    .setFooter({ text: `${pInfos.selectedPage}/${pInfos.maxPageInt} • Référencement officiel des Discords DirtyBiologistanais.`})
+                    .setFooter({ text: `Référencement officiel des Discords DirtyBiologistanais.`})
                     .setTimestamp()
-            ],
-            components: [row]
+            ]
         })
         return;
     }
@@ -139,10 +138,11 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
             .setCustomId(buttonID_after)
             .setLabel("▶")
             .setStyle(Discord.ButtonStyle.Primary)
+            .setDisabled( (pageManager.getInfos().pageCount == 1) )
         )
         .addComponents(
             new Discord.ButtonBuilder()
-            .setLabel("Site")
+            .setLabel("Recherche affinée")
             .setStyle(Discord.ButtonStyle.Link)
             .setURL(config.website.url)
         );
