@@ -29,7 +29,7 @@ let commandInformations = {
     rolesNeeded: [],
     superAdminOnly: false,
     disabled: false,
-    indev: true,
+    indev: false,
     hideOnHelp: false
 }
 
@@ -156,13 +156,14 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
         embeds: [
             new Discord.EmbedBuilder()
                 .setColor("#4444FF")
-                .setDescription(`\`${serverCount}\` serveurs référencé • \`${query}\`
-                Survolez les (?) pour afficher des infos
-
-                ${pageManager.getSelectedPage().join("\n")}
-
-                _💡 Recherche plus affinées et personnalisables sur [le site](${config.website.url})_
-                `)
+                .setDescription([
+                    `\`${serverCount}\` serveurs référencé • \`${query}\``,
+                    `Survolez les (?) pour afficher des infos`
+                    ``,
+                    `${pageManager.getSelectedPage().join("\n")}`,
+                    ``,
+                    `_💡 Recherche plus affinées et personnalisables sur [le site](${config.website.url})_`,
+                    ``].join(""))
                 .setFooter({ text: `${pInfos.selectedPage}/${pInfos.maxPageInt} • Référencement officiel des Discords DirtyBiologistanais.`})
                 .setTimestamp()
         ],
@@ -243,13 +244,13 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
                 embeds: [
                     new Discord.EmbedBuilder()
                         .setColor("#4444FF")
-                        .setDescription(`\`${serverCount}\` serveurs référencé • \`${query}\`
-                        Survolez les (?) pour afficher des infos
-
-                        ${pageManager.getSelectedPage().join("\n")}
-                        
-                        _💡 Recherche plus affinées et personnalisables sur [le site](${config.website.url})_
-                        `)
+                        .setDescription([`\`${serverCount}\` serveurs référencé • \`${query}\``,
+                        `Survolez les (?) pour afficher des infos`,
+                        ``,
+                        `${pageManager.getSelectedPage().join("\n")}`,
+                        ``,
+                        `_💡 Recherche plus affinées et personnalisables sur [le site](${config.website.url})_`,
+                        ``].join(""))
                         .setFooter({ text: `${pInfos.selectedPage}/${pInfos.maxPageInt} • Référencement officiel des Discords DirtyBiologistanais.`})
                         .setTimestamp()
                 ],
@@ -262,13 +263,13 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
                 embeds: [
                     new Discord.EmbedBuilder()
                         .setColor("#4444FF")
-                        .setDescription(`\`${serverCount}\` serveurs référencé • \`${query}\`
-                        Survolez les (?) pour afficher des infos
-
-                        ${pageManager.getSelectedPage().join("\n")}
-
-                        _💡 Recherche plus affinées et personnalisables sur [le site](${config.website.url})_
-                        `)
+                        .setDescription([`\`${serverCount}\` serveurs référencé • \`${query}\``,
+                        `Survolez les (?) pour afficher des infos`,
+                        ``,
+                        `${pageManager.getSelectedPage().join("\n")}`,
+                        ``,
+                        `_💡 Recherche plus affinées et personnalisables sur [le site](${config.website.url})_`,
+                        ``].join(""))
                         .setFooter({ text: `${pInfos.selectedPage}/${pInfos.maxPageInt} • Référencement officiel des Discords DirtyBiologistanais.`})
                         .setTimestamp()
                 ],
