@@ -57,7 +57,7 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
         let closes_contrat = contrat.join("\n")
 
 
-        let initial_msg = `Vous allez référencer ce Discord en tant que Discord autour de la micro-nation du DirtyBiologistan.\n**Attention** cela implique les choses suivantes:\n${closes_contrat}\n\nLe référencement commencera automatiquement dans 30 secondes.`
+        let initial_msg = `Vous allez référencer ce Discord en tant que Discord autour de la micro-nation du DirtyBiologistan.\n**Attention** cela implique les choses suivantes:\n${closes_contrat}`
 
 
         let buttonID_confirm = `referenceguild_${Modules.somef.genHex(32)}`
@@ -135,6 +135,7 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
 
                 return;
             } else if(i.customId == buttonID_confirm) {
+                i.deferUpdate()
 
                 i.message.edit({
                     content: i.message.content,

@@ -1,6 +1,4 @@
-
 const Discord = require('discord.js');
-const { PermissionsBitField } = Discord
 
 
 module.exports.checkPermissions = checkPermissions
@@ -284,3 +282,109 @@ function checkPermissionList(member) {
     }
 
 }
+
+
+
+function listToChunks(arr, chunkSize) {
+    const res = [];
+    for (let i = 0; i < arr.length; i += chunkSize) {
+        const chunk = arr.slice(i, i + chunkSize);
+        res.push(chunk);
+    }
+    return res;
+}
+module.exports.listToChunks = listToChunks
+
+function _lenOfLastInArray(arr) {
+    return arr[arr.length-1].length
+}
+module.exports._lenOfLastInArray = _lenOfLastInArray
+
+class pageManager {
+    constructor(pageList, pageLength=10) {
+        this.pageList = pageList
+        this.pageLength = pageLength
+        this.selectedPage = 0
+    }
+
+    selectPage(int) { this.selectedPage = int }
+    getSelectedPage() { return this.getPage(this.selectedPage) }
+    switchPage(int) {
+        let temp = this.selectedPage + Math.round(int)
+        let maxPageInt = this.getInfos().maxPageInt
+        if(temp <= 0) temp = 0
+        if(temp >= maxPageInt) temp = maxPageInt
+        this.selectedPage = temp
+        return {
+            pageInt: this.selectedPage,
+            edge: (temp == 0 || temp == maxPageInt)
+        }
+    }
+
+    setPageLength(int) {
+        this.pageLength = int
+    }
+
+    autoSetPageLength(fromInt=2,toInt=Infinity) {
+        let temp1 = []
+        if(fromInt > Math.floor(this.pageList.length/2+1)) throw new Error(`PageManager: Cannot find ideal page length with range [${fromInt} to ${toInt}] because the possible range is [1, ${Math.floor(this.pageList.length/2+1)}] (half length of list +1)`)
+        for(let i=fromInt; ( (i < this.pageList.length/2+1) && (i < toInt)) ;i++) {
+            let test = listToChunks(this.pageList,i)
+            if(_lenOfLastInArray(test) == i) {
+                this.pageLength = i
+                //console.log(`Set page length to ${i}, making last array size of ${_lenOfLastInArray(test)} [perfect result found]`)
+                return;
+            }
+            temp1.push({
+                i: i,
+                lenOfLast: _lenOfLastInArray(test)
+            })
+        }
+
+        //console.log("temp1",temp1)
+
+        let temp2 = temp1.sort((a,b) => {
+            return a.lenOfLast - b.lenOfLast
+        })
+        //console.log("temp2",temp2)
+        let minLenOfLast = temp2[0].lenOfLast
+        let temp3 = temp2.filter(item => {
+            return item.lenOfLast == minLenOfLast
+        })
+        //console.log("temp3",temp3)
+        let temp4 = temp3.sort((a,b) => {
+            return a.i - b.i
+        })
+        //console.log("temp4",temp4)
+
+        let bestResult = temp4[0]
+
+        this.pageLength = bestResult.i
+        //console.log(`Set page length to ${bestResult.i}, making last array size of ${bestResult.lenOfLast} [best result found]`)
+    }
+
+    _getPageChunks() {
+    return listToChunks(this.pageList, this.pageLength)
+    }
+
+    getPage(int) {
+        let pages = this._getPageChunks()
+        if( !((int >= 0) && (int < pages.length)) ) throw new Error(`PageManager: Cannot get page ${int} when pages are 0 to ${pages.length-1}`)
+        return pages[int]
+    }
+    
+    getInfos() {
+        let pages = this._getPageChunks()
+        return {
+            pageList: this.pageList,
+            pageLength: this.pageLength,
+            pageCount: pages.length,
+            selectedPage: this.selectedPage,
+            maxPageInt: pages.length-1
+        }
+    }
+
+
+}
+
+module.exports.pageManager = pageManager

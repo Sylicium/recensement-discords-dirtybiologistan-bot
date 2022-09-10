@@ -196,8 +196,6 @@ module.exports = {
         
         let embeds = []
 
-        let spaceChars = `$${somef.genHex(3)}$`
-
         function splitArrayIntoChunksOfLen(arr, len) {
             var chunks = [], i = 0, n = arr.length;
             while (i < n) {
