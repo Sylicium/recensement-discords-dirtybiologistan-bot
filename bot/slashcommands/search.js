@@ -69,7 +69,7 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
             t = `${guildObject.guild.name} [(?)](${thisChanUrl} "Invitation invalide #C-02")`
         }
         //let t = `> ${guildObject.inviteURL ? `**[${guildObject.guild.name}${nameAddon}](${the_url} "${guildObject.inviteURL}")**` : `${guildObject.guild.name}[(?)](${thisChanUrl} "Invitation invalide")`}`
-        console.log("t:",t)
+        //console.log("t:",t)
         return t
     }
 
@@ -94,13 +94,33 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
     let all_discords_lines = discords.map((item) => {
         return getGuild_textBloc(item)
     })
-    console.log("all_discords_lines",all_discords_lines)
+    //console.log("all_discords_lines",all_discords_lines)
 
 
     let pageManager = new botf.pageManager(all_discords_lines,10)
     pageManager.selectPage(0)
 
-    console.log("pageManager.getSelectedPage()",pageManager.getSelectedPage())
+    //console.log("pageManager.getSelectedPage()",pageManager.getSelectedPage())
+
+    if(all_discords_lines.length == 0) {
+        interaction.editReply({
+            embeds: [
+                new Discord.EmbedBuilder()
+                    .setColor("#4444FF")
+                    .setDescription(`\`${serverCount}\` serveurs référencé • \`${query}\`
+                    Survolez les (?) pour afficher des infos
+    
+                    Aucun serveur trouvé avec la recherche.
+    
+                    _💡 Recherche plus affinées et personnalisables sur [le site](${config.website.url})_
+                    `)
+                    .setFooter({ text: `${pInfos.selectedPage}/${pInfos.maxPageInt} • Référencement officiel des Discords DirtyBiologistanais.`})
+                    .setTimestamp()
+            ],
+            components: [row]
+        })
+        return;
+    }
 
 
     let buttonID_before = `search_before${Modules.somef.genHex(32)}`
@@ -136,7 +156,7 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
         embeds: [
             new Discord.EmbedBuilder()
                 .setColor("#4444FF")
-                .setDescription(`\`${serverCount}\` serveurs référencé 
+                .setDescription(`\`${serverCount}\` serveurs référencé • \`${query}\`
                 Survolez les (?) pour afficher des infos
 
                 ${pageManager.getSelectedPage().join("\n")}
@@ -223,7 +243,7 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
                 embeds: [
                     new Discord.EmbedBuilder()
                         .setColor("#4444FF")
-                        .setDescription(`\`${serverCount}\` serveurs référencé 
+                        .setDescription(`\`${serverCount}\` serveurs référencé • \`${query}\`
                         Survolez les (?) pour afficher des infos
 
                         ${pageManager.getSelectedPage().join("\n")}
@@ -242,7 +262,7 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
                 embeds: [
                     new Discord.EmbedBuilder()
                         .setColor("#4444FF")
-                        .setDescription(`\`${serverCount}\` serveurs référencé 
+                        .setDescription(`\`${serverCount}\` serveurs référencé • \`${query}\`
                         Survolez les (?) pour afficher des infos
 
                         ${pageManager.getSelectedPage().join("\n")}
