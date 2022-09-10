@@ -107,13 +107,13 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
             embeds: [
                 new Discord.EmbedBuilder()
                     .setColor("#4444FF")
-                    .setDescription(`\`${serverCount}\` serveurs référencé • \`${query}\`
-                    Survolez les (?) pour afficher des infos
-    
-                    Aucun serveur trouvé avec la recherche.
-    
-                    _💡 Recherche plus affinées et personnalisables sur [le site](${config.website.url})_
-                    `)
+                    .setDescription([`\`${serverCount}\` serveurs référencé • \`${query}\``,
+                    `Survolez les (?) pour afficher des infos`,
+                    ``,
+                    `Aucun serveur trouvé avec la recherche.`,
+                    ``,
+                    `_💡 Recherche plus affinées et personnalisables sur [le site](${config.website.url})_`,
+                    ``].join("\n"))
                     .setFooter({ text: `Référencement officiel des Discords DirtyBiologistanais.`})
                     .setTimestamp()
             ]
@@ -158,12 +158,12 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
                 .setColor("#4444FF")
                 .setDescription([
                     `\`${serverCount}\` serveurs référencé • \`${query}\``,
-                    `Survolez les (?) pour afficher des infos`
+                    `Survolez les (?) pour afficher des infos`,
                     ``,
                     `${pageManager.getSelectedPage().join("\n")}`,
                     ``,
                     `_💡 Recherche plus affinées et personnalisables sur [le site](${config.website.url})_`,
-                    ``].join(""))
+                    ``].join("\n"))
                 .setFooter({ text: `${pInfos.selectedPage}/${pInfos.maxPageInt} • Référencement officiel des Discords DirtyBiologistanais.`})
                 .setTimestamp()
         ],
@@ -250,7 +250,7 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
                         `${pageManager.getSelectedPage().join("\n")}`,
                         ``,
                         `_💡 Recherche plus affinées et personnalisables sur [le site](${config.website.url})_`,
-                        ``].join(""))
+                        ``].join("\n"))
                         .setFooter({ text: `${pInfos.selectedPage}/${pInfos.maxPageInt} • Référencement officiel des Discords DirtyBiologistanais.`})
                         .setTimestamp()
                 ],
@@ -269,7 +269,7 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
                         `${pageManager.getSelectedPage().join("\n")}`,
                         ``,
                         `_💡 Recherche plus affinées et personnalisables sur [le site](${config.website.url})_`,
-                        ``].join(""))
+                        ``].join("\n"))
                         .setFooter({ text: `${pInfos.selectedPage}/${pInfos.maxPageInt} • Référencement officiel des Discords DirtyBiologistanais.`})
                         .setTimestamp()
                 ],
