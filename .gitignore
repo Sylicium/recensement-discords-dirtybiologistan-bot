@@ -13,4 +13,4 @@ node_modules
 node_modules/*
 node_modules/
 /node_modules/*
-datas/keepalive.json
+/datas/keepalive.json

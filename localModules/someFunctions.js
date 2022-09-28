@@ -226,3 +226,19 @@ function sleep(ms) {
   });
 }
 
+
+
+/**
+ * parseHTMLpart(): retourne le morceau de document html généré à partir du code html donné en texte brut
+ * @param {string} string - Code html en texte brut
+ * @returns html document
+ */
+module.exports.parseHTMLpart = parseHTMLpart
+function parseHTMLpart(string) {
+    let DOMparser = new DOMParser(); // DOMparser.parseFromString("string")
+    let string2 = `<div class="ZojGHNZkjZOJzcAEJNGZACILkgjhazLCDigjhlibzdfcikbgzakCieeeeeeeeebdhbikhbfIZHKCDFikZAC">${string}</div>`
+    //console.log(string2)
+    let a = DOMparser.parseFromString(string2, "text/html")
+    let b = a.getElementsByClassName("ZojGHNZkjZOJzcAEJNGZACILkgjhazLCDigjhlibzdfcikbgzakCieeeeeeeeebdhbikhbfIZHKCDFikZAC")[0].firstChild
+    return b
+}

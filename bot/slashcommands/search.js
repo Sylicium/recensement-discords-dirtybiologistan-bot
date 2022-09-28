@@ -122,7 +122,7 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
     }
 
 
-    let buttonID_before = `search_before${Modules.somef.genHex(32)}`
+    let buttonID_before = `search_before_${Modules.somef.genHex(32)}`
     let buttonID_after = `search_after_${Modules.somef.genHex(32)}`
 
     let row = new Discord.ActionRowBuilder()
@@ -185,9 +185,6 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
         
         let hasPerm_user = botf.checkPermissions(commandInformations.permisionsNeeded.user, i.member)
 
-        if (!hasPerm_user.havePerm && !Modules.somef.isSuperAdmin(i.user.id)) {
-            return i.reply(`Vous n'avez pas la permission d'utiliser cette commande. \`ADMINISTRATOR\` or \`MANAGE_GUILD\` `)
-        }
         i.deferUpdate()
 
 
