@@ -1,7 +1,7 @@
 
 const discordInv = require('discord-inv');
 
-let inDev = true
+let inDev = false
 
 function writeUncaughException(e, title) {
     console.error("[DBG] Uncaught Exception or Rejection", e.stack)
