@@ -153,7 +153,7 @@ function getBitFieldPermission(permNameOrList) {
 
 /**
  * createMdodal(modalConfiguration): renvoie l'objet de modal créé avec la liste d'option fournie
- * @version: 1.0.0
+ * @version: 2.0.0
  * @param {Object} modalConfiguration - La liste des options du modal
 */
 function createModal(modalConfiguration) {
@@ -163,13 +163,29 @@ function createModal(modalConfiguration) {
         title: "titre",
         options: [
             {
-                customId: "test",
-                label: "coucou",
-                style: "short"
+                customId: "test",   // required
+                label: "coucou",    // required
+                style: "short",     // required
+                minLength: 10,          // optionnal
+                maxLength: 1000,        // optionnal
+                placeholder: "coucou",  // optionnal
+                value: "1",             // optionnal
+                required: true          // optionnal
             }
         ]
     }
     */
+
+    for(let op_i in modalConfiguration.options) {
+        let item = modalConfiguration.options[op_i]
+        if(item.value != undefined && item.minLength != undefined) {
+            Logger.debug("item.value:",item.value)
+            Logger.debug("item.minLength:",item.minLength)
+            Logger.debug("`${item.value}`.length",`${item.value}`.length)
+            Logger.debug(" `${item.value}`.length <= item.minLength", `${item.value}`.length <= item.minLength)
+            if( `${item.value}`.length <= item.minLength ) throw new Error(`[botf.createModal] value length is less than minLength specified.`)
+        }
+    }
 
     function getStyleFrom(styleName) {
         if(styleName == "short") {
@@ -180,16 +196,24 @@ function createModal(modalConfiguration) {
     }
 
     let modal = new Discord.ModalBuilder()
-		.setCustomId(modalConfiguration.setCustomId)
+		.setCustomId(modalConfiguration.customId)
 		.setTitle(modalConfiguration.title);
     
-    let allOptionsComponents = modalConfiguration.map((item, index) => {
-        return new Discord.ActionRowBuilder().addComponents(
-            new Discord.TextInputBuilder()
-			.setCustomId(item.customId)
-			.setLabel(item.label)
-			.setStyle(getStyleFrom(item.style))
-        )
+    let allOptionsComponents = modalConfiguration.options.map((item, index) => {
+
+        let component = new Discord.TextInputBuilder()
+            .setCustomId(item.customId)
+            .setLabel(item.label)
+            .setStyle(getStyleFrom(item.style))
+        
+        if( item.maxLength != undefined ) component.setMaxLength(item.maxLength)
+        if( item.minLength != undefined ) component.setMinLength(item.minLength)
+        if( item.placeholder != undefined ) component.setPlaceholder(item.placeholder)
+        if( item.value != undefined ) component.setValue(item.value)
+        if( item.required != undefined ) component.setRequired(item.required);
+
+        return new Discord.ActionRowBuilder().addComponents(component)
+       
     })
 
     modal.addComponents(...allOptionsComponents)
@@ -201,9 +225,9 @@ module.exports.createModal = createModal
 
 
 module.exports.checkPermissionList = checkPermissionList
-function checkPermissionList(member) {
+function checkPermissionList(member, perm_list=undefined) {
 
-    let perm_list = [
+    if(!perm_list) perm_list = [
 { name: "CREATE_INSTANT_INVITE", shouldHave: true },
 { name: "KICK_MEMBERS", shouldHave: false },
 { name: "BAN_MEMBERS", shouldHave: false },
@@ -300,6 +324,9 @@ function _lenOfLastInArray(arr) {
 }
 module.exports._lenOfLastInArray = _lenOfLastInArray
 
+/**
+ * @version 1.0.0
+ */
 class pageManager {
     constructor(pageList, pageLength=10) {
         this.pageList = pageList

@@ -111,6 +111,19 @@ function removeDuplicates(list) {
     return list.filter((x, i) => i === list.indexOf(x))
 }
 
+/**
+ * f(): Retourne une liste de plusieur morceau de la liste donnée de longueur maximum spécifiée
+ *
+ */
+function listToChunks(arr, chunkSize) {
+    const res = [];
+    for (let i = 0; i < arr.length; i += chunkSize) {
+        const chunk = arr.slice(i, i + chunkSize);
+        res.push(chunk);
+    }
+    return res;
+}
+module.exports.listToChunks = listToChunks
 
 
 module.exports.formatDate = formatDate

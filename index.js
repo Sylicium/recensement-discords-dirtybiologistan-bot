@@ -308,6 +308,18 @@ function _allCode() {
                         .setFooter({ text: `Essayez de contacter un administrateur.` })
                 ],
                 ephemeral: false
+            }).then(() => { }).catch(e => {
+                interaction.reply({
+                    content: [
+                        `**🤖 Aie.. Le bot manque de permissions!**`,
+                        `Il a besoin des permissions suivantes:`,
+                        `${hasPerm_bot.missingPermissions.map((x) => {
+                            return `\`${x}\``
+                        }).join(", ")}`,
+                        ``,
+                        `_Essayez de contacter un administrateur._`
+                    ].join("\n")
+                })
             })
         }
         if(!hasPerm_user.havePerm && !somef.isSuperAdmin(interaction.user.id)) {
