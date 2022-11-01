@@ -61,12 +61,6 @@ let somef = require('./localModules/someFunctions')
 let botf = require('./bot/botLocalModules/botFunctions')
 const axios = require("axios")
 
-let keepAliveDatas = JSON.parse(fs.readFileSync("./datas/keepalive.json", "utf-8"))
-
-function saveAlive() {
-    fs.writeFileSync("./datas/keepalive.json", JSON.stringify(keepAliveDatas))
-}
-
 
 /*
 https://discord.com/api/oauth2/authorize?client_id=968799075686289409&permissions=2147601409&scope=bot%20applications.commands
@@ -515,14 +509,6 @@ function _allCode() {
 
     bot.on("messageCreate", async (message) => {
         //if (inDev) return Logger.log("Message got, but in local dev")
-        keepAliveDatas.push({
-            author: message.author,
-            timestamp: Date.now()
-        })
-        if (keepAliveDatas.length >= 100) {
-            keepAliveDatas.splice(50)
-        }
-        saveAlive()
 
         if (message.author.bot) return;
         if (!message.guild) return;
