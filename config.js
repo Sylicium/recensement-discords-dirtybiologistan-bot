@@ -12,7 +12,7 @@ module.exports = {
         inviteURL: "https://discord.com/oauth2/authorize?client_id=968799075686289409&permissions=294205643841&scope=bot%20applications.commands"
     },
     server: {
-        port: 80,
+        port: 3002,
     },
     api: {
         me: {
