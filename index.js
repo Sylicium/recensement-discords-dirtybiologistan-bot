@@ -1,6 +1,8 @@
 
 
-let inDev = true
+let config = require('./config')
+
+let inDev = condif.inDev
 
 try {
     require("dotenv").config()
@@ -56,7 +58,6 @@ let Intents = Discord.Intents
 let EmbedBuilder = Discord.EmbedBuilder
 const fs = require("fs");
 //const { SlashCommandBuilder } = require("discordjs/builders")
-let config = require('./config')
 let somef = require('./localModules/someFunctions')
 let botf = require('./bot/botLocalModules/botFunctions')
 const axios = require("axios")
@@ -516,7 +517,7 @@ function _allCode() {
         message.guild.me_ = () => { return message.guild.members.cache.get(bot.user.id) }
         
         if (inDev) {
-            Logger.log("[message] message got, but in local dev so dont add it")
+            Logger.log(`[message] message got, but in local dev so dont add it | [${message.guild.name.substr(0,15)}] <${message.author.tag}> ${message.content.substr(0,20)}`)
         } else {
             Database.addMessageOnGuild(message)
         }

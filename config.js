@@ -1,4 +1,5 @@
 module.exports = {
+    inDev: false,
     bot: {
         prefix: "r!",
         id: "",
