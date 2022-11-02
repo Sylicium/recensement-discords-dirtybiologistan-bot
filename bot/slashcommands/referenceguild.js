@@ -131,11 +131,10 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
                         i.message.delete().catch(e => {})
                     }, 10*1000)
                 })
-                i.deferUpdate()
+                // i.deferUpdate()
 
                 return;
             } else if(i.customId == buttonID_confirm) {
-                i.deferUpdate()
 
                 i.message.edit({
                     content: i.message.content,
