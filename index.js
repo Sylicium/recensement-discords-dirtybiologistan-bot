@@ -1,12 +1,13 @@
 
 
-let config = require('./config')
-
-let inDev = condif.inDev
-
 try {
     require("dotenv").config()
 } catch(e) {}
+
+let config = require('./config')
+
+let inDev = config.inDev
+
 
 function writeUncaughException(e, title) {
     console.error("[DBG] Uncaught Exception or Rejection", e.stack)
