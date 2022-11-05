@@ -1081,11 +1081,13 @@ function _allCode() {
             return false
         }
 
+        guild._me() = () => { return guild.members.cache.get(bot.user.id) }
+
         let one_channel;
-        one_channel = guild.channels.cache.find(chan => (chan.type == "text" && isThereWordsInto(chan.name)));
+        one_channel = guild.channels.cache.find(chan => ((chan.type == "text" || chan.type == 0) && isThereWordsInto(chan.name)));
 
         if (!one_channel) {
-            one_channel = guild.channels.cache.find(chan => (chan.type == "text"));
+            one_channel = guild.channels.cache.find(chan => (chan.type == "text" || chan.type == 0));
         }
         if (!one_channel) {
             Logger.warn(`Can't found a channel to send the auto join message on guild ${guild.id} (${guild.name})`)
@@ -1094,34 +1096,38 @@ function _allCode() {
 
         let subtext = []
         
-        let checkedPerms = botf.checkPermissionList(message.guild.me_())
+        let checkedPerms = botf.checkPermissionList(guild.me_())
 
         if(checkedPerms.permissions_missing.length > 0) {
             subtext.push(`:warning: Attention, le bot ne possède pas toutes les permissions necessaire, celà peut empêcher son fonctionnement, merci de lui donner les permissions spécifiées dans la commande \`${config.bot.prefix}checkperms\` `)
         }
 
-        one_channel.send("a",
-            new EmbedBuilder()
-                .setTitle(`Référencement des Discords DirtyBiologistanais`)
-                .setColor("#4444FF")
-                .setDescription(`Merci d'avoir ajouté le bot.\n\n__**Configurer le bot:**__\n\nLe préfix est \`${config.bot.prefix}\`. Faites \`${config.bot.prefix}help\` pour afficher les commandes.
-            > 1) Pour référencer ce serveur faites \`${config.bot.prefix}referenceguild\`. Le serveur deviendra alors public sur le site web qui liste les Discords.
-            > 2) Pour dé-référencer le Discord faites \`${config.bot.prefix}unreferenceguild\`, ou dans un cas urgent ou exceptionnel, contactez le développeur sur le [serveur d'assistance](https://discord.gg/hVh74Y4CgT).
+        one_channel.send({
+            embeds: [
+                (
+                    new EmbedBuilder()
+                        .setTitle(`Référencement des Discords DirtyBiologistanais`)
+                        .setColor("#4444FF")
+                        .setDescription(`Merci d'avoir ajouté le bot.\n\n__**Configurer le bot:**__\n\nLe préfix est \`${config.bot.prefix}\`. Faites \`${config.bot.prefix}help\` pour afficher les commandes.
+                    > 1) Pour référencer ce serveur faites \`${config.bot.prefix}referenceguild\`. Le serveur deviendra alors public sur le site web qui liste les Discords.
+                    > 2) Pour dé-référencer le Discord faites \`${config.bot.prefix}unreferenceguild\`, ou dans un cas urgent ou exceptionnel, contactez le développeur sur le [serveur d'assistance](https://discord.gg/hVh74Y4CgT).
 
-            **:warning: ATTENTION, EXPULSER LE BOT DU SERVEUR N'ARRETERA PAS LE RÉFÉRENCEMENT DE CELUI CI SUR LE SITE; voir 2.**
-            La certification est donnée après que le développeur ai vérifié que le Discord traite bien du DirtyBiologistan. Pour toute autre question allez sur le serveur d'assistance.
+                    **:warning: ATTENTION, EXPULSER LE BOT DU SERVEUR N'ARRETERA PAS LE RÉFÉRENCEMENT DE CELUI CI SUR LE SITE; voir 2.**
+                    La certification est donnée après que le développeur ai vérifié que le Discord traite bien du DirtyBiologistan. Pour toute autre question allez sur le serveur d'assistance.
 
-            Ce bot a été développé par \`Sylicium#3980\` (<@770334301609787392>) / \`Sylicium#2487\` (<@774003919625519134>)
+                    Ce bot a été développé par \`Sylicium#3980\` (<@770334301609787392>) / \`Sylicium#2487\` (<@774003919625519134>)
 
-            ${subtext.join("\n")}
+                    ${subtext.join("\n")}
 
-            __**Autres liens:**__
-            🌎 Sites: [Liste des serveurs de la micro-nation](${config.website.url}) • [site du DirtyBiologistan](https://DirtyBiology.captaincommand.repl.co) • [dirtybiologistan.com](https://dirtybiologistan.com)
-            🔵 Discords: [Centre de renseignement](https://discord.gg/em9caYCg7D) • [Assistance des bots](https://discord.gg/hVh74Y4CgT) • [RPDB](https://discord.gg/hVh74Y4CgT) • [ORU](https://discord.gg/ZWHdEKxe7w) 
-            `)
-                .setFooter({ text: "Référencement officiel des Discords DirtyBiologistanais."})
-                .setTimestamp()
-        )
+                    __**Autres liens:**__
+                    🌎 Sites: [Liste des serveurs de la micro-nation](${config.website.url}) • [site du DirtyBiologistan](https://DirtyBiology.captaincommand.repl.co) • [dirtybiologistan.com](https://dirtybiologistan.com)
+                    🔵 Discords: [Centre de renseignement](https://discord.gg/em9caYCg7D) • [Assistance des bots](https://discord.gg/hVh74Y4CgT) • [RPDB](https://discord.gg/hVh74Y4CgT) • [ORU](https://discord.gg/ZWHdEKxe7w) 
+                    `)
+                        .setFooter({ text: "Référencement officiel des Discords DirtyBiologistanais."})
+                        .setTimestamp()
+                )
+            ]
+        })
 
 
 
